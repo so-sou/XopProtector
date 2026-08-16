@@ -1,0 +1,604 @@
+<UserControl x:Class="Protector.Desktop.Pages.HardenPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:Protector.Desktop.Resources"
+             Background="{DynamicResource BgApp}">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="460"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+
+    <!-- Left: stepped config -->
+    <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,0,1,0" Background="{DynamicResource BgApp}">
+      <DockPanel>
+        <Border DockPanel.Dock="Bottom" Padding="24,14,24,18" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="0,1,0,0">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="8"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="SecondaryBtn" Grid.Column="0" Style="{StaticResource GhostButton}"
+                    Content="{x:Static res:Strings.Harden_Cancel}" Visibility="Collapsed" Click="Cancel_Click"/>
+            <Button x:Name="PrimaryBtn" Grid.Column="0" Grid.ColumnSpan="3"
+                    Style="{StaticResource PrimaryButton}" Content="{x:Static res:Strings.Harden_SelectAppFirst}"
+                    IsEnabled="False" Click="Protect_Click" Padding="18,12" FontSize="13"/>
+            <Button x:Name="OpenDirBtn" Grid.Column="2" Style="{StaticResource PrimaryButton}"
+                    Content="{x:Static res:Strings.Harden_OpenFolder}" Visibility="Collapsed" Click="OpenDir_Click"/>
+            <Button x:Name="ResetBtn" Grid.Column="0" Style="{StaticResource GhostButton}"
+                    Content="{x:Static res:Strings.Harden_Reset}" Visibility="Collapsed" Click="Reset_Click"/>
+          </Grid>
+        </Border>
+
+        <ScrollViewer x:Name="ConfigScroll" VerticalScrollBarVisibility="Hidden"
+                      HorizontalScrollBarVisibility="Disabled" Padding="24,20,24,8"
+                      CanContentScroll="False">
+          <StackPanel>
+            <!-- Step 1: 上传应用 -->
+            <Border CornerRadius="10" Padding="16,14" Margin="0,0,0,14"
+                    Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1">
+              <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                  <Border Width="22" Height="22" CornerRadius="11" Background="{DynamicResource Accent}" Margin="0,0,10,0">
+                    <TextBlock Text="1" FontSize="11" FontWeight="Bold" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  </Border>
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{x:Static res:Strings.Harden_Step1Title}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                    <TextBlock Text="{x:Static res:Strings.Harden_Step1Sub}"
+                               FontSize="11" Foreground="{DynamicResource TextDim}" Margin="0,2,0,0"/>
+                  </StackPanel>
+                </StackPanel>
+
+                <Border x:Name="DropZone" CornerRadius="8" BorderThickness="1.5" BorderBrush="{DynamicResource Border}"
+                        Background="{DynamicResource CardBg}" Cursor="Hand" Padding="24,22"
+                        MouseLeftButtonUp="DropZone_Click"
+                        AllowDrop="True" Drop="DropZone_Drop" DragOver="DropZone_DragOver"
+                        DragEnter="DropZone_DragEnter" DragLeave="DropZone_DragLeave">
+                  <StackPanel HorizontalAlignment="Center">
+                    <TextBlock Text="⬆" FontSize="20" Foreground="{DynamicResource TextFaint}" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="DropHint" Text="{x:Static res:Strings.Harden_DropHint}" FontSize="12" FontWeight="Medium"
+                               Foreground="{DynamicResource TextMuted}" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                  </StackPanel>
+                </Border>
+
+                <Border x:Name="FileCard" Visibility="Collapsed" CornerRadius="8" Padding="12,12"
+                        Background="{DynamicResource SuccessBg}" BorderBrush="{DynamicResource SuccessBorder}" BorderThickness="1">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="36" Height="36" CornerRadius="6" Background="{DynamicResource StageDoneBg}"
+                            BorderBrush="{DynamicResource SuccessBorder}" BorderThickness="1">
+                      <TextBlock Text="APK" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource SuccessMeta}"
+                                 FontFamily="Consolas" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12,0,8,0" VerticalAlignment="Center">
+                      <TextBlock x:Name="FileNameText" FontSize="12" FontWeight="Medium"
+                                 Foreground="{DynamicResource SuccessText}" TextTrimming="CharacterEllipsis"/>
+                      <TextBlock x:Name="FileMetaText" FontSize="10" Foreground="{DynamicResource SuccessMeta}"
+                                 FontFamily="Consolas" Margin="0,2,0,0"/>
+                    </StackPanel>
+                    <Border Grid.Column="2" Width="18" Height="18" CornerRadius="9" Margin="0,0,6,0"
+                            Background="{DynamicResource Success}" VerticalAlignment="Center">
+                      <TextBlock Text="✓" FontSize="10" FontWeight="Bold" Foreground="White"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <Button Grid.Column="3" Content="✕" Background="Transparent" BorderThickness="0"
+                            Foreground="{DynamicResource TextDim}" Cursor="Hand" Click="ClearFile_Click"
+                            Padding="6,2" VerticalAlignment="Center"/>
+                  </Grid>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                  <TextBlock Text="ⓘ" FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                  <TextBlock Text="{x:Static res:Strings.Harden_FileLimit}"
+                             FontSize="10" Foreground="{DynamicResource TextFaint}" VerticalAlignment="Center"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- Steps 2–4: shown after upload -->
+            <StackPanel x:Name="OptionsPanel" Visibility="Collapsed">
+            <!-- Step 2: 加固策略 -->
+            <Border CornerRadius="10" Padding="16,14" Margin="0,0,0,14"
+                    Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1">
+              <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                  <Border Width="22" Height="22" CornerRadius="11" Background="{DynamicResource Accent}" Margin="0,0,10,0">
+                    <TextBlock Text="2" FontSize="11" FontWeight="Bold" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  </Border>
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{x:Static res:Strings.Harden_Step2Title}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                    <TextBlock Text="{x:Static res:Strings.Harden_Step2Sub}"
+                               FontSize="11" Foreground="{DynamicResource TextDim}" Margin="0,2,0,0"/>
+                  </StackPanel>
+                </StackPanel>
+
+                <!-- Profile -->
+                <Border Margin="0,0,0,8" Padding="12,10" CornerRadius="8"
+                        Background="{DynamicResource CardBg}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="32" Height="32" CornerRadius="8" Margin="0,0,10,0"
+                            Background="{DynamicResource AccentBg}" BorderBrush="{DynamicResource AccentBorder}" BorderThickness="1">
+                      <Viewbox Width="15" Height="15" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Canvas Width="24" Height="24">
+                          <Path Stroke="{DynamicResource Accent}" StrokeThickness="1.5"
+                                Data="M12,2 L4,5.5 V12.5 C4,17.3 7.4,21.8 12,23 C16.6,21.8 20,17.3 20,12.5 V5.5 Z"/>
+                        </Canvas>
+                      </Viewbox>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{x:Static res:Strings.Harden_ProfileTitle}" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextPrimary}"/>
+                        <Border Background="{DynamicResource AccentBg}" CornerRadius="3" Padding="5,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                          <TextBlock Text="{x:Static res:Strings.Harden_Recommended}" FontSize="9" Foreground="{DynamicResource AccentSoft}"/>
+                        </Border>
+                      </StackPanel>
+                      <TextBlock Text="{x:Static res:Strings.Harden_ProfileSub}" FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <ComboBox x:Name="ProfileBox" Grid.Column="2" Width="128" Style="{StaticResource DarkCombo}"
+                              SelectedIndex="0" VerticalAlignment="Center" Cursor="Hand"
+                              SelectionChanged="ProfileBox_SelectionChanged">
+                      <ComboBoxItem Tag="balanced" Content="{x:Static res:Strings.Profile_Balanced}"/>
+                      <ComboBoxItem Tag="industry" Content="{x:Static res:Strings.Profile_Industry}"/>
+                      <ComboBoxItem Tag="perf" Content="{x:Static res:Strings.Profile_Perf}"/>
+                      <ComboBoxItem Tag="aggressive" Content="{x:Static res:Strings.Profile_Aggressive}"/>
+                      <ComboBoxItem Tag="max" Content="{x:Static res:Strings.Profile_Max}"/>
+                    </ComboBox>
+                  </Grid>
+                </Border>
+                <TextBlock x:Name="ProfileHint" Text="{x:Static res:Strings.Harden_ProfileHint}"
+                           FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="4,0,0,10"
+                           TextWrapping="Wrap" Visibility="Collapsed"/>
+
+                <!-- SO protect -->
+                <Border x:Name="OptSo" Margin="0,0,0,8" Padding="12,10" CornerRadius="8"
+                        Background="{DynamicResource CardBg}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1"
+                        Cursor="Hand" MouseLeftButtonUp="ToggleSo_Click">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="32" Height="32" CornerRadius="8" Margin="0,0,10,0"
+                            Background="{DynamicResource AccentBg}" BorderBrush="{DynamicResource AccentBorder}" BorderThickness="1">
+                      <Viewbox Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Canvas Width="24" Height="24">
+                          <Path Stroke="{DynamicResource Accent}" StrokeThickness="1.6" StrokeLineJoin="Round"
+                                Data="M7,11 V8 C7,5.2 9.2,3 12,3 C14.8,3 17,5.2 17,8 V11"/>
+                          <Path Stroke="{DynamicResource Accent}" StrokeThickness="1.6" Fill="{DynamicResource AccentBg}"
+                                Data="M6,11 H18 V20 H6 Z"/>
+                        </Canvas>
+                      </Viewbox>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{x:Static res:Strings.Harden_SoTitle}" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextPrimary}"/>
+                        <Border Background="{DynamicResource AccentBg}" CornerRadius="3" Padding="5,1" Margin="8,0,0,0" VerticalAlignment="Center">
+                          <TextBlock Text="{x:Static res:Strings.Harden_Recommended}" FontSize="9" Foreground="{DynamicResource AccentSoft}"/>
+                        </Border>
+                      </StackPanel>
+                      <TextBlock Text="{x:Static res:Strings.Harden_SoSub}" FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <Border x:Name="SoToggle" Grid.Column="2" Width="36" Height="20" CornerRadius="10"
+                            Background="{DynamicResource Accent}" VerticalAlignment="Center">
+                      <Ellipse x:Name="SoKnob" Width="14" Height="14" Fill="White"
+                               HorizontalAlignment="Right" Margin="0,3,3,0"/>
+                    </Border>
+                  </Grid>
+                </Border>
+
+                <!-- SO mode (visible only when SO protect is on) -->
+                <Border x:Name="SoModePanel" Margin="0,0,0,8" Padding="12,10" CornerRadius="8"
+                        Background="{DynamicResource CardBg}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1">
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto"/>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="32" Height="32" CornerRadius="8" Margin="0,0,10,0"
+                            Background="{DynamicResource AccentBg}" BorderBrush="{DynamicResource AccentBorder}" BorderThickness="1">
+                      <TextBlock Text="&lt;/&gt;" FontSize="10" FontWeight="Bold" FontFamily="Consolas"
+                                 Foreground="{DynamicResource Accent}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Text="{x:Static res:Strings.Harden_SoModeTitle}" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextPrimary}"/>
+                      <TextBlock Text="{x:Static res:Strings.Harden_SoModeSub}" FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="0,3,0,0"/>
+                    </StackPanel>
+                    <ComboBox x:Name="SoModeBox" Grid.Column="2" Width="128" Style="{StaticResource DarkCombo}"
+                              SelectedIndex="0" VerticalAlignment="Center" Cursor="Hand">
+                      <ComboBoxItem Tag="safe" Content="{x:Static res:Strings.SoMode_Safe}"/>
+                      <ComboBoxItem Tag="aggressive" Content="{x:Static res:Strings.SoMode_Aggressive}"/>
+                      <ComboBoxItem Tag="max" Content="{x:Static res:Strings.SoMode_Max}"/>
+                    </ComboBox>
+                  </Grid>
+                </Border>
+
+                <!-- Advanced: auto True-VMP + SO budget -->
+                <Expander x:Name="AdvancedExpander" Margin="0,10,0,0" IsExpanded="False"
+                          Foreground="{DynamicResource TextPrimary}">
+                  <Expander.Header>
+                    <TextBlock Text="{x:Static res:Strings.Harden_AdvancedTitle}" FontSize="12" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}"/>
+                  </Expander.Header>
+                  <StackPanel Margin="0,10,0,0">
+                    <TextBlock Text="{x:Static res:Strings.Harden_AdvancedSub}" FontSize="10"
+                               Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                    <TextBlock Text="{x:Static res:Strings.Harden_AutoVmpSection}" FontSize="11" FontWeight="Medium"
+                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                    <CheckBox x:Name="PaymentAutoVmpBox" IsChecked="True" Margin="0,0,0,6"
+                              Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
+                              Checked="PaymentAutoVmp_Changed" Unchecked="PaymentAutoVmp_Changed">
+                      <TextBlock Text="{x:Static res:Strings.Harden_PaymentAutoVmp}" FontSize="12"
+                                 TextWrapping="Wrap"/>
+                    </CheckBox>
+                    <CheckBox x:Name="IndustryAutoVmpBox" IsChecked="False" Margin="0,0,0,4"
+                              Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
+                              Checked="IndustryAutoVmp_Changed" Unchecked="IndustryAutoVmp_Changed">
+                      <TextBlock Text="{x:Static res:Strings.Harden_IndustryAutoVmp}" FontSize="12"
+                                 TextWrapping="Wrap"/>
+                    </CheckBox>
+                    <TextBlock Text="{x:Static res:Strings.Harden_AutoVmpSlowTip}" FontSize="10"
+                               Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                      <TextBlock Text="{x:Static res:Strings.Harden_TrueVmpPrefix}" FontSize="11" FontWeight="Medium"
+                                 Foreground="{DynamicResource TextDim}"/>
+                      <TextBlock Text="ⓘ" FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="6,0,0,0"
+                                 VerticalAlignment="Center" ToolTip="{x:Static res:Strings.Harden_TrueVmpTip}"/>
+                    </StackPanel>
+                    <TextBox x:Name="TrueVmpBox" Style="{StaticResource DarkInput}" Margin="0,0,0,12"
+                             ToolTip="{x:Static res:Strings.Harden_TrueVmpExample}"
+                             AcceptsReturn="True" MinHeight="44" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"/>
+
+                    <TextBlock Text="{x:Static res:Strings.Harden_SoBudgetSection}" FontSize="11" FontWeight="Medium"
+                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                    <TextBlock x:Name="SoBudgetHint" FontSize="10" Foreground="{DynamicResource TextFaint}"
+                               Margin="0,0,0,6" TextWrapping="Wrap"/>
+                    <Grid Margin="0,0,0,8">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="8"/>
+                        <ColumnDefinition Width="*"/>
+                      </Grid.ColumnDefinitions>
+                      <StackPanel>
+                        <TextBlock Text="{x:Static res:Strings.Harden_SoBudgetMb}" FontSize="10"
+                                   Foreground="{DynamicResource TextDim}" Margin="0,0,0,4"/>
+                        <TextBox x:Name="SoBudgetBox" Style="{StaticResource DarkInput}"
+                                 ToolTip="{x:Static res:Strings.Harden_SoBudgetTip}"
+                                 TextChanged="SoBudget_TextChanged"/>
+                      </StackPanel>
+                      <StackPanel Grid.Column="2">
+                        <TextBlock Text="{x:Static res:Strings.Harden_SoMaxFileMb}" FontSize="10"
+                                   Foreground="{DynamicResource TextDim}" Margin="0,0,0,4"/>
+                        <TextBox x:Name="SoMaxFileBox" Style="{StaticResource DarkInput}"
+                                 ToolTip="{x:Static res:Strings.Harden_SoMaxFileTip}"
+                                 TextChanged="SoBudget_TextChanged"/>
+                      </StackPanel>
+                    </Grid>
+                    <Button Content="{x:Static res:Strings.Harden_ResetAdvanced}" Style="{StaticResource GhostButton}"
+                            HorizontalAlignment="Left" Padding="10,6" Click="ResetAdvanced_Click"
+                            Cursor="Hand" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="{x:Static res:Strings.Harden_ExtraProtectSection}" FontSize="11" FontWeight="Medium"
+                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                    <CheckBox x:Name="EncryptAssetsBox" IsChecked="False" Margin="0,0,0,6"
+                              Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
+                              ToolTip="{x:Static res:Strings.Harden_EncryptAssetsTip}">
+                      <TextBlock Text="{x:Static res:Strings.Harden_EncryptAssets}" FontSize="12" TextWrapping="Wrap"/>
+                    </CheckBox>
+                    <CheckBox x:Name="ResProtectBox" IsChecked="False" Margin="0,0,0,6"
+                              Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
+                              ToolTip="{x:Static res:Strings.Harden_ResProtectTip}">
+                      <TextBlock Text="{x:Static res:Strings.Harden_ResProtect}" FontSize="12" TextWrapping="Wrap"/>
+                    </CheckBox>
+                    <CheckBox x:Name="DetectProxyBox" IsChecked="False" Margin="0,0,0,6"
+                              Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
+                              ToolTip="{x:Static res:Strings.Harden_DetectProxyTip}">
+                      <TextBlock Text="{x:Static res:Strings.Harden_DetectProxy}" FontSize="12" TextWrapping="Wrap"/>
+                    </CheckBox>
+                    <TextBlock Text="{x:Static res:Strings.Harden_PinCerts}" FontSize="10"
+                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,4"/>
+                    <Grid Margin="0,0,0,12">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                      </Grid.ColumnDefinitions>
+                      <TextBox x:Name="PinCertsBox" Style="{StaticResource DarkInput}"
+                               ToolTip="{x:Static res:Strings.Harden_PinCertsTip}"/>
+                      <Button Grid.Column="1" Margin="8,0,0,0" Padding="10,0" Style="{StaticResource GhostButton}"
+                              Click="BrowsePinCerts_Click" ToolTip="{x:Static res:Strings.Harden_BrowsePinCerts}">
+                        <Viewbox Width="14" Height="14">
+                          <Canvas Width="24" Height="24">
+                            <Path Stroke="{DynamicResource TextMuted}" StrokeThickness="1.6" StrokeLineJoin="Round"
+                                  Data="M3,7 H9 L11,9 H21 V19 H3 Z"/>
+                          </Canvas>
+                        </Viewbox>
+                      </Button>
+                    </Grid>
+
+                    <TextBlock Text="{x:Static res:Strings.Harden_Channel}" FontSize="11" FontWeight="Medium"
+                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,4"/>
+                    <TextBox x:Name="ChannelBox" Style="{StaticResource DarkInput}" Margin="0,0,0,4"
+                             ToolTip="{x:Static res:Strings.Harden_ChannelTip}"/>
+                    <TextBlock Text="{x:Static res:Strings.Harden_ChannelNeedSign}" FontSize="10"
+                               Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap" Margin="0,0,0,12"/>
+
+                    <TextBlock Text="{x:Static res:Strings.Harden_PrefixSection}" FontSize="11" FontWeight="Medium"
+                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                      <TextBlock Text="{x:Static res:Strings.Harden_HollowPrefix}" FontSize="10"
+                                 Foreground="{DynamicResource TextDim}"/>
+                      <TextBlock Text="ⓘ" FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="6,0,0,0"
+                                 VerticalAlignment="Center" ToolTip="{x:Static res:Strings.Harden_HollowPrefixTip}"/>
+                    </StackPanel>
+                    <TextBox x:Name="HollowPrefixBox" Style="{StaticResource DarkInput}" Margin="0,0,0,8"
+                             ToolTip="{x:Static res:Strings.Harden_TrueVmpExample}"
+                             AcceptsReturn="True" MinHeight="36" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                      <TextBlock Text="{x:Static res:Strings.Harden_Vmp1Prefix}" FontSize="10"
+                                 Foreground="{DynamicResource TextDim}"/>
+                      <TextBlock Text="ⓘ" FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="6,0,0,0"
+                                 VerticalAlignment="Center" ToolTip="{x:Static res:Strings.Harden_Vmp1PrefixTip}"/>
+                    </StackPanel>
+                    <TextBox x:Name="Vmp1PrefixBox" Style="{StaticResource DarkInput}" Margin="0,0,0,0"
+                             ToolTip="{x:Static res:Strings.Harden_TrueVmpExample}"
+                             AcceptsReturn="True" MinHeight="36" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto"/>
+                  </StackPanel>
+                </Expander>
+              </StackPanel>
+            </Border>
+
+            <!-- Step 3: 签名配置 -->
+            <Border CornerRadius="10" Padding="16,14" Margin="0,0,0,14"
+                    Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1">
+              <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                  <Border Width="22" Height="22" CornerRadius="11" Background="{DynamicResource Accent}" Margin="0,0,10,0">
+                    <TextBlock Text="3" FontSize="11" FontWeight="Bold" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  </Border>
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{x:Static res:Strings.Harden_Step3Title}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                    <TextBlock Text="{x:Static res:Strings.Harden_Step3Sub}"
+                               FontSize="11" Foreground="{DynamicResource TextDim}" Margin="0,2,0,0"/>
+                  </StackPanel>
+                </StackPanel>
+
+                <UniformGrid Columns="2" Margin="0,0,0,0">
+                  <Border x:Name="SignAutoCard" Margin="0,0,6,0" Padding="12,12" CornerRadius="8" Cursor="Hand"
+                          Background="{DynamicResource AccentBg}" BorderBrush="{DynamicResource Accent}" BorderThickness="1.5"
+                          MouseLeftButtonUp="SignMode_Click" Tag="auto">
+                    <StackPanel Orientation="Horizontal">
+                      <Border x:Name="SignAutoDot" Width="14" Height="14" CornerRadius="7" Margin="0,0,8,0"
+                              Background="{DynamicResource Accent}" BorderBrush="{DynamicResource Accent}" BorderThickness="1.5"
+                              VerticalAlignment="Center">
+                        <Ellipse Width="6" Height="6" Fill="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                      </Border>
+                      <TextBlock Text="{x:Static res:Strings.Harden_SignNone}" FontSize="12" FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                  </Border>
+
+                  <Border x:Name="SignCustomCard" Margin="6,0,0,0" Padding="12,12" CornerRadius="8" Cursor="Hand"
+                          Background="{DynamicResource CardBg}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1.5"
+                          MouseLeftButtonUp="SignMode_Click" Tag="custom">
+                    <StackPanel Orientation="Horizontal">
+                      <Border x:Name="SignCustomDot" Width="14" Height="14" CornerRadius="7" Margin="0,0,8,0"
+                              Background="Transparent" BorderBrush="{DynamicResource TextFaint}" BorderThickness="1.5"
+                              VerticalAlignment="Center"/>
+                      <TextBlock Text="{x:Static res:Strings.Harden_SignCustom}" FontSize="12" FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                  </Border>
+                </UniformGrid>
+
+                <StackPanel x:Name="SignFields" Visibility="Collapsed" Margin="0,12,0,0">
+                  <TextBlock Text="{x:Static res:Strings.Harden_KeystorePath}" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                  <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*"/>
+                      <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="KeystoreBox" Style="{StaticResource DarkInput}" ToolTip="{x:Static res:Strings.Harden_KeystorePath}"
+                             TextChanged="KeystoreBox_TextChanged"/>
+                    <Button Grid.Column="1" Margin="8,0,0,0" Padding="10,0" Style="{StaticResource GhostButton}"
+                            Click="BrowseKeystore_Click" ToolTip="{x:Static res:Strings.Harden_BrowseKeystore}">
+                      <Viewbox Width="14" Height="14">
+                        <Canvas Width="24" Height="24">
+                          <Path Stroke="{DynamicResource TextMuted}" StrokeThickness="1.6" StrokeLineJoin="Round"
+                                Data="M3,7 H9 L11,9 H21 V19 H3 Z"/>
+                        </Canvas>
+                      </Viewbox>
+                    </Button>
+                  </Grid>
+
+                  <TextBlock Text="{x:Static res:Strings.Harden_StorePass}" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                  <PasswordBox x:Name="StorePassBox" Style="{StaticResource DarkPassword}" Margin="0,0,0,12"
+                               ToolTip="{x:Static res:Strings.Harden_StorePass}" PasswordChanged="StorePassBox_PasswordChanged"/>
+
+                  <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="{x:Static res:Strings.Harden_Alias}" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource TextDim}"/>
+                    <TextBlock x:Name="AliasHint" FontSize="10" Foreground="{DynamicResource TextFaint}"
+                               Margin="8,0,0,0" VerticalAlignment="Center"/>
+                  </StackPanel>
+                  <TextBox x:Name="AliasBox" Style="{StaticResource DarkInput}" Margin="0,0,0,12"
+                           ToolTip="{x:Static res:Strings.Harden_AliasTip}" TextChanged="AliasBox_TextChanged"/>
+
+                  <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                    <TextBlock Text="{x:Static res:Strings.Harden_KeyPass}" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource TextDim}"/>
+                    <TextBlock Text="{x:Static res:Strings.Harden_KeyPassOptional}" FontSize="10" Foreground="{DynamicResource TextFaint}"
+                               Margin="4,0,0,0" VerticalAlignment="Center"/>
+                  </StackPanel>
+                  <PasswordBox x:Name="KeyPassBox" Style="{StaticResource DarkPassword}" ToolTip="{x:Static res:Strings.Harden_KeyPassTip}"
+                               PasswordChanged="KeyPassBox_PasswordChanged"/>
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <!-- Step 4: 输出设置 -->
+            <Border CornerRadius="10" Padding="16,14" Margin="0,0,0,8"
+                    Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1">
+              <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                  <Border Width="22" Height="22" CornerRadius="11" Background="{DynamicResource Accent}" Margin="0,0,10,0">
+                    <TextBlock Text="4" FontSize="11" FontWeight="Bold" Foreground="White"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                  </Border>
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{x:Static res:Strings.Harden_Step4Title}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                    <TextBlock Text="{x:Static res:Strings.Harden_Step4Sub}"
+                               FontSize="11" Foreground="{DynamicResource TextDim}" Margin="0,2,0,0"/>
+                  </StackPanel>
+                </StackPanel>
+
+                <TextBlock Text="{x:Static res:Strings.Harden_OutputPath}" FontSize="11" FontWeight="Medium" Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                <Grid Margin="0,0,0,0">
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <TextBox x:Name="OutputBox" Style="{StaticResource DarkInput}"/>
+                  <Button Grid.Column="1" Margin="8,0,0,0" Padding="10,0" Style="{StaticResource GhostButton}"
+                          Click="BrowseOutput_Click" ToolTip="{x:Static res:Strings.Harden_BrowseOutput}">
+                    <Viewbox Width="14" Height="14">
+                      <Canvas Width="24" Height="24">
+                        <Path Stroke="{DynamicResource TextMuted}" StrokeThickness="1.6" StrokeLineJoin="Round"
+                              Data="M3,7 H9 L11,9 H21 V19 H3 Z"/>
+                      </Canvas>
+                    </Viewbox>
+                  </Button>
+                </Grid>
+              </StackPanel>
+            </Border>
+            </StackPanel>
+          </StackPanel>
+        </ScrollViewer>
+      </DockPanel>
+    </Border>
+
+    <!-- Right: progress / log -->
+    <Border Grid.Column="1" Background="{DynamicResource CardBg}" BorderBrush="{DynamicResource Border}" BorderThickness="0">
+      <Grid>
+        <StackPanel x:Name="EmptyState" VerticalAlignment="Center" HorizontalAlignment="Center">
+          <Viewbox Width="48" Height="48" Opacity="0.35" HorizontalAlignment="Center">
+            <Canvas Width="24" Height="24">
+              <Path Stroke="{DynamicResource Accent}" StrokeThickness="1.2"
+                    Data="M12,2 L4,5.5 V12.5 C4,17.3 7.4,21.8 12,23 C16.6,21.8 20,17.3 20,12.5 V5.5 Z"/>
+            </Canvas>
+          </Viewbox>
+          <TextBlock Text="{x:Static res:Strings.Harden_EmptyTitle}" FontSize="13" Foreground="{DynamicResource TextDim}"
+                     HorizontalAlignment="Center" Margin="0,12,0,0"/>
+          <TextBlock Text="{x:Static res:Strings.Harden_EmptySub}" FontSize="11" Foreground="{DynamicResource TextFaint}"
+                     HorizontalAlignment="Center" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <DockPanel x:Name="WorkPanel" Visibility="Collapsed">
+          <Border DockPanel.Dock="Top" Padding="24,18,24,14" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="0,0,0,1">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel>
+                <TextBlock x:Name="PhaseTitle" Text="{x:Static res:Strings.Harden_PhaseReady}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+                <TextBlock x:Name="PhaseFile" FontSize="11" Foreground="{DynamicResource TextMuted}" FontFamily="Consolas" Margin="0,3,0,0"/>
+                <Border Height="4" Background="{DynamicResource BorderSoft}" CornerRadius="2" Margin="0,12,16,0">
+                  <Border x:Name="ProgressFill" Width="0" HorizontalAlignment="Left" CornerRadius="2" Background="{DynamicResource Accent}"/>
+                </Border>
+              </StackPanel>
+              <Grid Grid.Column="1" Width="60" Height="60">
+                <Ellipse Stroke="{DynamicResource BorderSoft}" StrokeThickness="3"/>
+                <TextBlock x:Name="PctText" Text="0%" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource Accent}"
+                           FontFamily="Consolas" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Grid>
+            </Grid>
+          </Border>
+
+          <Border DockPanel.Dock="Top" Padding="24,14" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="0,0,0,1">
+            <UniformGrid x:Name="StageStrip" Columns="7" Rows="1"/>
+          </Border>
+
+          <Border x:Name="DoneCard" DockPanel.Dock="Bottom" Margin="24,0,24,20" Padding="14,14"
+                  Background="{DynamicResource SuccessBg}" BorderBrush="{DynamicResource SuccessBorder}" BorderThickness="1" CornerRadius="8"
+                  Visibility="Collapsed">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{x:Static res:Strings.Harden_Success}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SuccessMeta}"/>
+                <TextBlock x:Name="DoneOutput" FontSize="11" Foreground="{DynamicResource SuccessText}" FontFamily="Consolas"
+                           Margin="0,3,0,0" TextTrimming="CharacterEllipsis" Visibility="Collapsed"/>
+                <ComboBox x:Name="DeviceBox" Style="{StaticResource DarkCombo}" Margin="0,8,12,0"
+                          MinWidth="180" MaxWidth="360" HorizontalAlignment="Left"
+                          Visibility="Collapsed"
+                          ToolTip="{x:Static res:Strings.Harden_SelectDeviceTip}"/>
+              </StackPanel>
+              <Button x:Name="InstallTestBtn" Grid.Column="1" Content="{x:Static res:Strings.Harden_InstallTest}"
+                      Style="{StaticResource PrimaryButton}" VerticalAlignment="Center"
+                      Background="{DynamicResource Success}" Foreground="{DynamicResource SuccessBtnFg}"
+                      Click="InstallTest_Click" Padding="14,8" Visibility="Collapsed"/>
+            </Grid>
+          </Border>
+
+          <DockPanel Margin="24,12,24,16">
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="{x:Static res:Strings.Harden_ExecLog}" FontSize="11" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextDim}" VerticalAlignment="Center"/>
+                <TextBlock x:Name="LogPathHint" FontSize="10" Foreground="{DynamicResource TextFaint}"
+                           Margin="10,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                           MaxWidth="280" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button x:Name="CopyLogBtn" Content="{x:Static res:Strings.Harden_CopyLog}"
+                        Style="{StaticResource GhostButton}" Padding="10,4" Margin="0,0,6,0"
+                        Click="CopyLog_Click" Cursor="Hand"
+                        ToolTip="{x:Static res:Strings.Harden_CopyLogTip}"/>
+                <Button x:Name="OpenLogBtn" Content="{x:Static res:Strings.Harden_OpenLog}"
+                        Style="{StaticResource GhostButton}" Padding="10,4"
+                        Click="OpenLog_Click" Cursor="Hand"
+                        ToolTip="{x:Static res:Strings.Harden_OpenLogTip}"/>
+              </StackPanel>
+            </Grid>
+            <Border Background="{DynamicResource BgLog}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1" CornerRadius="6" Padding="10,8">
+              <TextBox x:Name="LogText" Style="{StaticResource LogViewer}" VerticalAlignment="Stretch">
+                <TextBox.ContextMenu>
+                  <ContextMenu>
+                    <MenuItem Header="{x:Static res:Strings.Harden_CopyLog}" Click="CopyLog_Click"/>
+                    <MenuItem Header="{x:Static res:Strings.Harden_SelectAllLog}" Click="SelectAllLog_Click"/>
+                    <Separator/>
+                    <MenuItem Header="{x:Static res:Strings.Harden_OpenLog}" Click="OpenLog_Click"/>
+                  </ContextMenu>
+                </TextBox.ContextMenu>
+              </TextBox>
+            </Border>
+          </DockPanel>
+        </DockPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</UserControl>

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ProductName" xml:space="preserve"><value>XopProtector</value></data>
+  <data name="EngineReady" xml:space="preserve"><value>引擎就绪</value></data>
+  <data name="EngineLocal" xml:space="preserve"><value> · 本地引擎</value></data>
+  <data name="EnginePrefix" xml:space="preserve"><value>引擎 </value></data>
+  <data name="EngineNotFound" xml:space="preserve"><value>引擎未找到</value></data>
+  <data name="TooltipMinimize" xml:space="preserve"><value>最小化</value></data>
+  <data name="TooltipMaximize" xml:space="preserve"><value>最大化</value></data>
+  <data name="TooltipRestore" xml:space="preserve"><value>还原</value></data>
+  <data name="TooltipClose" xml:space="preserve"><value>关闭</value></data>
+  <data name="Nav_Harden" xml:space="preserve"><value>应用加固</value></data>
+  <data name="Nav_HardenSub" xml:space="preserve"><value>加固</value></data>
+  <data name="Nav_History" xml:space="preserve"><value>加固历史</value></data>
+  <data name="Nav_HistorySub" xml:space="preserve"><value>历史</value></data>
+  <data name="Nav_Reports" xml:space="preserve"><value>安全报告</value></data>
+  <data name="Nav_ReportsSub" xml:space="preserve"><value>报告</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>设置</value></data>
+  <data name="Nav_SettingsSub" xml:space="preserve"><value>设置</value></data>
+  <data name="Harden_Cancel" xml:space="preserve"><value>取消</value></data>
+  <data name="Harden_SelectAppFirst" xml:space="preserve"><value>请先选择应用文件</value></data>
+  <data name="Harden_OpenFolder" xml:space="preserve"><value>打开目录</value></data>
+  <data name="Harden_Reset" xml:space="preserve"><value>重新加固</value></data>
+  <data name="Harden_Step1Title" xml:space="preserve"><value>上传应用</value></data>
+  <data name="Harden_Step1Sub" xml:space="preserve"><value>支持 Android APK（本地引擎）</value></data>
+  <data name="Harden_DropHint" xml:space="preserve"><value>拖拽文件至此，或点击选择</value></data>
+  <data name="Harden_FileLimit" xml:space="preserve"><value>文件大小限制：2 GB  |  支持格式：.apk</value></data>
+  <data name="Harden_Step2Title" xml:space="preserve"><value>加固策略</value></data>
+  <data name="Harden_Step2Sub" xml:space="preserve"><value>选择适合您业务需求的加固配置</value></data>
+  <data name="Harden_ProfileTitle" xml:space="preserve"><value>Profile 策略</value></data>
+  <data name="Harden_Recommended" xml:space="preserve"><value>推荐</value></data>
+  <data name="Harden_ProfileSub" xml:space="preserve"><value>平衡强度与性能（industry=行业预设；自动 VMP 在高级选项）</value></data>
+  <data name="Harden_ProfileHint" xml:space="preserve"><value>industry 预设：默认开启行业自动 True-VMP 与更大 SO 预算，可在「高级选项」调整。</value></data>
+  <data name="Profile_Balanced" xml:space="preserve"><value>均衡</value></data>
+  <data name="Profile_Industry" xml:space="preserve"><value>行业</value></data>
+  <data name="Profile_Perf" xml:space="preserve"><value>性能</value></data>
+  <data name="Profile_Aggressive" xml:space="preserve"><value>激进</value></data>
+  <data name="Profile_Max" xml:space="preserve"><value>最强</value></data>
+  <data name="SoMode_Safe" xml:space="preserve"><value>安全</value></data>
+  <data name="SoMode_Aggressive" xml:space="preserve"><value>激进</value></data>
+  <data name="SoMode_Max" xml:space="preserve"><value>最强</value></data>
+  <data name="Harden_SoTitle" xml:space="preserve"><value>SO 库保护</value></data>
+  <data name="Harden_SoSub" xml:space="preserve"><value>业务 SO .text RC4 加密</value></data>
+  <data name="Harden_SoModeTitle" xml:space="preserve"><value>SO 模式</value></data>
+  <data name="Harden_SoModeSub" xml:space="preserve"><value>安全性与兼容性平衡（推荐）</value></data>
+  <data name="Harden_AdvancedTitle" xml:space="preserve"><value>高级选项</value></data>
+  <data name="Harden_AdvancedSub" xml:space="preserve"><value>自动 True-VMP、前缀、SO 预算、assets/res/渠道/NetGuard</value></data>
+  <data name="Harden_AutoVmpSection" xml:space="preserve"><value>自动 True-VMP</value></data>
+  <data name="Harden_PaymentAutoVmp" xml:space="preserve"><value>支付 SDK 回调（PaymentVmpRules）</value></data>
+  <data name="Harden_IndustryAutoVmp" xml:space="preserve"><value>行业敏感类（IndustryVmpRules）</value></data>
+  <data name="Harden_AutoVmpSlowTip" xml:space="preserve"><value>命中较多（尤其行业自动）时加固会明显变慢。</value></data>
+  <data name="Harden_SoBudgetSection" xml:space="preserve"><value>SO 体积预算</value></data>
+  <data name="Harden_SoBudgetHintDefault" xml:space="preserve"><value>留空则使用引擎默认（12 / 8 MB）。</value></data>
+  <data name="Harden_SoBudgetHintIndustry" xml:space="preserve"><value>留空则使用 industry 默认（48 / 24 MB）。</value></data>
+  <data name="Harden_SoBudgetMb" xml:space="preserve"><value>预算 (MB)</value></data>
+  <data name="Harden_SoMaxFileMb" xml:space="preserve"><value>单文件上限 (MB)</value></data>
+  <data name="Harden_SoBudgetTip" xml:space="preserve"><value>可选。覆盖 --protect-so-budget-mb</value></data>
+  <data name="Harden_SoMaxFileTip" xml:space="preserve"><value>可选。覆盖 --protect-so-max-file-mb</value></data>
+  <data name="Harden_ResetAdvanced" xml:space="preserve"><value>重置高级为 Profile 默认</value></data>
+  <data name="Harden_ExtraProtectSection" xml:space="preserve"><value>额外保护</value></data>
+  <data name="Harden_EncryptAssets" xml:space="preserve"><value>加密 assets/**</value></data>
+  <data name="Harden_EncryptAssetsTip" xml:space="preserve"><value>AES-GCM 加密 assets 到 protector/aenc（默认关）</value></data>
+  <data name="Harden_ResProtect" xml:space="preserve"><value>资源路径混淆</value></data>
+  <data name="Harden_ResProtectTip" xml:space="preserve"><value>缩短 res/ 路径并改写 resources.arsc（默认关）</value></data>
+  <data name="Harden_DetectProxy" xml:space="preserve"><value>检测代理 / VPN（NetGuard）</value></data>
+  <data name="Harden_DetectProxyTip" xml:space="preserve"><value>运行时启用代理/VPN 启发式检测</value></data>
+  <data name="Harden_PinCerts" xml:space="preserve"><value>证书钉扎文件（可选）</value></data>
+  <data name="Harden_PinCertsTip" xml:space="preserve"><value>叶子证书 SHA-256 十六进制，每行一个</value></data>
+  <data name="Harden_BrowsePinCerts" xml:space="preserve"><value>浏览 pin-certs 文件</value></data>
+  <data name="Harden_PinCertsMissing" xml:space="preserve"><value>找不到 pin-certs 文件。</value></data>
+  <data name="Harden_Channel" xml:space="preserve"><value>渠道号</value></data>
+  <data name="Harden_ChannelTip" xml:space="preserve"><value>签名后写入 Walle 兼容渠道号</value></data>
+  <data name="Harden_ChannelNeedSign" xml:space="preserve"><value>需要开启自定义签名（keystore）。</value></data>
+  <data name="Harden_ChannelNeedSignWarn" xml:space="preserve"><value>填写渠道号需要自定义签名。请在步骤 3 开启签名，或清空渠道号。</value></data>
+  <data name="Harden_PrefixSection" xml:space="preserve"><value>方法前缀（可选）</value></data>
+  <data name="Harden_HollowPrefix" xml:space="preserve"><value>Hollow 前缀</value></data>
+  <data name="Harden_HollowPrefixTip" xml:space="preserve"><value>Hollow 类型前缀白名单；用 ; 或换行分隔</value></data>
+  <data name="Harden_Vmp1Prefix" xml:space="preserve"><value>VMP1 前缀</value></data>
+  <data name="Harden_Vmp1PrefixTip" xml:space="preserve"><value>PVM1 打包（解码回 DEX）；用 ; 或换行分隔</value></data>
+  <data name="Harden_Step3Title" xml:space="preserve"><value>签名配置</value></data>
+  <data name="Harden_Step3Sub" xml:space="preserve"><value>选择签名方式</value></data>
+  <data name="Harden_OutputPath" xml:space="preserve"><value>输出路径</value></data>
+  <data name="Harden_BrowseOutput" xml:space="preserve"><value>浏览输出路径</value></data>
+  <data name="Harden_TrueVmpPrefix" xml:space="preserve"><value>True-VMP 前缀</value></data>
+  <data name="Harden_TrueVmpTip" xml:space="preserve"><value>可选；多个前缀用 ; 分隔，例如 Lcom/foo/pay/;</value></data>
+  <data name="Harden_TrueVmpExample" xml:space="preserve"><value>例如 Lcom/foo/pay/;</value></data>
+  <data name="Harden_Step4Title" xml:space="preserve"><value>输出设置</value></data>
+  <data name="Harden_Step4Sub" xml:space="preserve"><value>配置加固后文件的输出选项</value></data>
+  <data name="Harden_SignNone" xml:space="preserve"><value>不签名（默认）</value></data>
+  <data name="Harden_SignCustom" xml:space="preserve"><value>自定义签名</value></data>
+  <data name="Harden_KeystorePath" xml:space="preserve"><value>Keystore 路径</value></data>
+  <data name="Harden_BrowseKeystore" xml:space="preserve"><value>浏览 Keystore</value></data>
+  <data name="Harden_StorePass" xml:space="preserve"><value>Store 密码</value></data>
+  <data name="Harden_Alias" xml:space="preserve"><value>Alias</value></data>
+  <data name="Harden_AliasTip" xml:space="preserve"><value>证书 Alias（输入密码后自动识别）</value></data>
+  <data name="Harden_KeyPass" xml:space="preserve"><value>Key 密码</value></data>
+  <data name="Harden_KeyPassOptional" xml:space="preserve"><value>（可空，默认与 Store 密码相同）</value></data>
+  <data name="Harden_KeyPassTip" xml:space="preserve"><value>Key 密码（可空）</value></data>
+  <data name="Harden_EmptyTitle" xml:space="preserve"><value>上传应用文件后开始加固</value></data>
+  <data name="Harden_EmptySub" xml:space="preserve"><value>进度与日志将在此显示</value></data>
+  <data name="Harden_PhaseReady" xml:space="preserve"><value>准备就绪</value></data>
+  <data name="Harden_Success" xml:space="preserve"><value>加固成功</value></data>
+  <data name="Harden_InstallTest" xml:space="preserve"><value>安装并启动</value></data>
+  <data name="Harden_Installing" xml:space="preserve"><value>安装中…</value></data>
+  <data name="Harden_SelectDeviceTip" xml:space="preserve"><value>选择要安装测试的 USB 设备</value></data>
+  <data name="Harden_InstallOk" xml:space="preserve"><value>已安装并启动：{0}</value></data>
+  <data name="Harden_InstallOkNoLaunch" xml:space="preserve"><value>已安装到 {0}，但启动失败：\n{1}</value></data>
+  <data name="Harden_InstallFail" xml:space="preserve"><value>安装失败：\n{0}</value></data>
+  <data name="Harden_AdbMissing" xml:space="preserve"><value>未找到 adb。请安装 Android platform-tools，或将 adb 加入 PATH。</value></data>
+  <data name="Harden_ApkMissing" xml:space="preserve"><value>找不到加固后的 APK：\n{0}</value></data>
+  <data name="Harden_NoDeviceSelected" xml:space="preserve"><value>请先选择 USB 设备。</value></data>
+  <data name="Harden_ExecLog" xml:space="preserve"><value>执行日志</value></data>
+  <data name="Harden_CopyLog" xml:space="preserve"><value>复制</value></data>
+  <data name="Harden_CopyLogTip" xml:space="preserve"><value>复制选中内容（无选中则全部）到剪贴板。也可在日志中拖选后 Ctrl+C。</value></data>
+  <data name="Harden_SelectAllLog" xml:space="preserve"><value>全选</value></data>
+  <data name="Harden_OpenLog" xml:space="preserve"><value>打开日志</value></data>
+  <data name="Harden_OpenLogTip" xml:space="preserve"><value>打开已保存的日志文件</value></data>
+  <data name="Harden_NoLogYet" xml:space="preserve"><value>还没有日志文件，请先开始加固。</value></data>
+  <data name="Harden_LogSavedBeside" xml:space="preserve"><value>日志已保存：{0}</value></data>
+  <data name="Harden_LogSavedAppData" xml:space="preserve"><value>日志已保存：{0}</value></data>
+  <data name="Harden_Start" xml:space="preserve"><value>开始加固</value></data>
+  <data name="Harden_EngineNotReady" xml:space="preserve"><value>引擎未就绪</value></data>
+  <data name="Harden_RestoredSign" xml:space="preserve"><value>已恢复上次签名配置</value></data>
+  <data name="Harden_Resolving" xml:space="preserve"><value>识别中…</value></data>
+  <data name="Harden_ResolveFailed" xml:space="preserve"><value>无法识别</value></data>
+  <data name="Harden_NoAlias" xml:space="preserve"><value>未找到 Alias</value></data>
+  <data name="Harden_AutoDetected" xml:space="preserve"><value>已自动识别</value></data>
+  <data name="Harden_MultiAlias" xml:space="preserve"><value>多个 Alias，已选第一个（可改）：</value></data>
+  <data name="Harden_NeedSignFields" xml:space="preserve"><value>自定义签名需要 Keystore、Alias 与 Store 密码。</value></data>
+  <data name="Harden_AliasMismatch" xml:space="preserve"><value>Alias 不匹配</value></data>
+  <data name="Harden_UseAlias" xml:space="preserve"><value>是否改用唯一 Alias "{0}"？</value></data>
+  <data name="Harden_KeystoreCheckFailed" xml:space="preserve"><value>Keystore 校验失败。</value></data>
+  <data name="Harden_SetOutput" xml:space="preserve"><value>请设置输出路径。</value></data>
+  <data name="Harden_PhaseRunning" xml:space="preserve"><value>加固进行中</value></data>
+  <data name="Harden_LogStart" xml:space="preserve"><value>开始加固：</value></data>
+  <data name="Harden_PhaseDone" xml:space="preserve"><value>加固完成</value></data>
+  <data name="Harden_OutputDir" xml:space="preserve"><value>输出目录：</value></data>
+  <data name="Harden_LogDone" xml:space="preserve"><value>加固完成，输出文件已保存，总共用时：{0}分钟</value></data>
+  <data name="Harden_PhaseFailed" xml:space="preserve"><value>失败 (exit {0})</value></data>
+  <data name="Harden_LogExit" xml:space="preserve"><value>引擎退出码 {0}</value></data>
+  <data name="Harden_PhaseCancelled" xml:space="preserve"><value>已取消</value></data>
+  <data name="Harden_LogCancelled" xml:space="preserve"><value>已取消加固。</value></data>
+  <data name="Harden_PhaseError" xml:space="preserve"><value>出错</value></data>
+  <data name="Harden_Cancelling" xml:space="preserve"><value>正在取消…</value></data>
+  <data name="Stage_Unzip" xml:space="preserve"><value>解析应用包</value></data>
+  <data name="Stage_Hollow" xml:space="preserve"><value>DEX 加固</value></data>
+  <data name="Stage_ProtectSo" xml:space="preserve"><value>SO 库保护</value></data>
+  <data name="Stage_Manifest" xml:space="preserve"><value>注入运行时</value></data>
+  <data name="Stage_Repack" xml:space="preserve"><value>资源重打包</value></data>
+  <data name="Stage_Sign" xml:space="preserve"><value>重签名</value></data>
+  <data name="Stage_Done" xml:space="preserve"><value>输出验证</value></data>
+  <data name="History_Title" xml:space="preserve"><value>加固历史</value></data>
+  <data name="History_Count" xml:space="preserve"><value>共 {0} 条</value></data>
+  <data name="History_Sub" xml:space="preserve"><value>本地任务记录，保存在 %AppData%\XopProtector</value></data>
+  <data name="History_FilterAll" xml:space="preserve"><value>全部</value></data>
+  <data name="History_FilterDone" xml:space="preserve"><value>成功</value></data>
+  <data name="History_FilterFailed" xml:space="preserve"><value>失败</value></data>
+  <data name="History_Clear" xml:space="preserve"><value>清空</value></data>
+  <data name="History_Empty" xml:space="preserve"><value>暂无历史记录</value></data>
+  <data name="History_EmptyHint" xml:space="preserve"><value>在「应用加固」完成一次任务后会出现在这里</value></data>
+  <data name="History_ConfirmClear" xml:space="preserve"><value>确定清空全部加固历史？</value></data>
+  <data name="History_StatusDone" xml:space="preserve"><value>成功</value></data>
+  <data name="History_StatusFailed" xml:space="preserve"><value>失败</value></data>
+  <data name="Reports_Title" xml:space="preserve"><value>安全报告</value></data>
+  <data name="Reports_Count" xml:space="preserve"><value>共 {0} 份</value></data>
+  <data name="Reports_Empty" xml:space="preserve"><value>暂无报告</value></data>
+  <data name="Reports_EmptyHint" xml:space="preserve"><value>加固成功后自动生成</value></data>
+  <data name="Reports_ScoreUnit" xml:space="preserve"><value>分</value></data>
+  <data name="Reports_EmptyDetail" xml:space="preserve"><value>选择左侧报告查看详情</value></data>
+  <data name="Reports_EmptyDetailHint" xml:space="preserve"><value>基于加固策略与 size_report 生成本地摘要</value></data>
+  <data name="Reports_Pass" xml:space="preserve"><value>通过</value></data>
+  <data name="Reports_Warn" xml:space="preserve"><value>警告</value></data>
+  <data name="Reports_Fail" xml:space="preserve"><value>失败</value></data>
+  <data name="Reports_OpenSizeReport" xml:space="preserve"><value>打开 size_report</value></data>
+  <data name="Reports_OpenOutput" xml:space="preserve"><value>打开输出目录</value></data>
+  <data name="Reports_NoSizeReport" xml:space="preserve"><value>未找到 size_report.json。</value></data>
+  <data name="Reports_CannotOpen" xml:space="preserve"><value>无法打开文件：\n</value></data>
+  <data name="Reports_NoOutput" xml:space="preserve"><value>无输出路径。</value></data>
+  <data name="Report_ScoreExcellent" xml:space="preserve"><value>优秀</value></data>
+  <data name="Report_ScoreGood" xml:space="preserve"><value>良好</value></data>
+  <data name="Report_ScoreImprove" xml:space="preserve"><value>待改善</value></data>
+  <data name="Report_SizeSummary" xml:space="preserve"><value>输入 {0:F2} MB → 输出 {1:F2} MB（Δ {2:+0.00;-0.00} MB / {3:+0.0;-0.0}%）</value></data>
+  <data name="Report_CatCode" xml:space="preserve"><value>代码保护</value></data>
+  <data name="Report_DexProtect" xml:space="preserve"><value>DEX 加固</value></data>
+  <data name="Report_DexProtectDetail" xml:space="preserve"><value>壳层 DEX 抽取 / 保护已应用（packer hollow）</value></data>
+  <data name="Report_ProfileCheck" xml:space="preserve"><value>Profile 策略</value></data>
+  <data name="Report_ProfileDetail" xml:space="preserve"><value>当前策略：{0}</value></data>
+  <data name="Report_SoOnDetail" xml:space="preserve"><value>业务 SO .text 加密已启用（模式 {0}）</value></data>
+  <data name="Report_SoOffDetail" xml:space="preserve"><value>未启用 SO 保护，Native 层风险较高</value></data>
+  <data name="Report_ShellInject" xml:space="preserve"><value>壳资源注入</value></data>
+  <data name="Report_ShellInjectDetail" xml:space="preserve"><value>运行时壳文件与 protector assets 已写入输出包</value></data>
+  <data name="Report_CatSign" xml:space="preserve"><value>签名与输出</value></data>
+  <data name="Report_CustomSign" xml:space="preserve"><value>自定义签名</value></data>
+  <data name="Report_CustomSignDetail" xml:space="preserve"><value>已使用自定义 Keystore 签名</value></data>
+  <data name="Report_AppSign" xml:space="preserve"><value>应用签名</value></data>
+  <data name="Report_AppSignWarn" xml:space="preserve"><value>加固后未签名，需自行签名后方可安装发布</value></data>
+  <data name="Report_OutputArtifact" xml:space="preserve"><value>输出产物</value></data>
+  <data name="Report_NoOutputPath" xml:space="preserve"><value>无输出路径</value></data>
+  <data name="Report_Duration" xml:space="preserve"><value>耗时</value></data>
+  <data name="Report_CatVolume" xml:space="preserve"><value>体积与 SO 决策</value></data>
+  <data name="Report_SizeReportMissing" xml:space="preserve"><value>未找到 size_report.json，仅展示任务摘要</value></data>
+  <data name="Report_PkgSize" xml:space="preserve"><value>包体积</value></data>
+  <data name="Report_PkgSizeChange" xml:space="preserve"><value>包体积变化</value></data>
+  <data name="Report_PkgSizeChangeDetail" xml:space="preserve"><value>{0:F2} MB → {1:F2} MB（Δ {2:+0.00;-0.00} MB）</value></data>
+  <data name="Report_SoEncrypt" xml:space="preserve"><value>SO 加密</value></data>
+  <data name="Report_SoEncryptedCount" xml:space="preserve"><value>已加密 {0} 个 SO</value></data>
+  <data name="Report_SoEncryptEmpty" xml:space="preserve"><value>已启用 SO 保护但无加密条目</value></data>
+  <data name="Report_SoEncryptOff" xml:space="preserve"><value>size_report 显示未启用 SO 保护</value></data>
+  <data name="Report_Budget" xml:space="preserve"><value>体积预算</value></data>
+  <data name="Report_BudgetHit" xml:space="preserve"><value>触发 so_skipped_budget，部分 SO 因预算跳过</value></data>
+  <data name="Report_BudgetOk" xml:space="preserve"><value>未触发预算截断</value></data>
+  <data name="Report_PolicySkip" xml:space="preserve"><value>策略跳过</value></data>
+  <data name="Report_PolicySkipDetail" xml:space="preserve"><value>{0} 个 SO 因策略跳过</value></data>
+  <data name="Report_RelocSkip" xml:space="preserve"><value>重定位跳过</value></data>
+  <data name="Report_RelocSkipDetail" xml:space="preserve"><value>{0} 个 SO 因 reloc 跳过</value></data>
+  <data name="Report_BudgetSkip" xml:space="preserve"><value>预算跳过</value></data>
+  <data name="Report_BudgetSkipDetail" xml:space="preserve"><value>{0} 个 SO 因预算跳过</value></data>
+  <data name="Report_AssetsOnDetail" xml:space="preserve"><value>业务 assets 已加密到 protector/aenc</value></data>
+  <data name="Report_AssetsOffDetail" xml:space="preserve"><value>未启用 assets 加密</value></data>
+  <data name="Report_ResOnDetail" xml:space="preserve"><value>已缩短 res/ 路径并改写 resources.arsc</value></data>
+  <data name="Report_ResOffDetail" xml:space="preserve"><value>未启用资源路径混淆</value></data>
+  <data name="Report_AutoVmp" xml:space="preserve"><value>自动 True-VMP</value></data>
+  <data name="Report_AutoVmpDetail" xml:space="preserve"><value>支付={0}，行业={1}</value></data>
+  <data name="Report_AutoVmpOffDetail" xml:space="preserve"><value>支付与行业自动 True-VMP 均未开启</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>设置</value></data>
+  <data name="Settings_TabAppearance" xml:space="preserve"><value>外观</value></data>
+  <data name="Settings_TabLanguage" xml:space="preserve"><value>语言</value></data>
+  <data name="Settings_TabAbout" xml:space="preserve"><value>关于 / 引擎</value></data>
+  <data name="Settings_AppearanceTitle" xml:space="preserve"><value>外观</value></data>
+  <data name="Settings_AppearanceSub" xml:space="preserve"><value>选择深色或浅色主题（默认深色）</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>主题</value></data>
+  <data name="Settings_ThemeDark" xml:space="preserve"><value>深色</value></data>
+  <data name="Settings_ThemeLight" xml:space="preserve"><value>浅色</value></data>
+  <data name="Settings_ThemeHint" xml:space="preserve"><value>主题偏好会保存在本机，下次启动自动恢复。</value></data>
+  <data name="Settings_LanguageTitle" xml:space="preserve"><value>语言</value></data>
+  <data name="Settings_LanguageSub" xml:space="preserve"><value>界面语言（更改后需重启应用）</value></data>
+  <data name="Settings_LangSystem" xml:space="preserve"><value>跟随系统</value></data>
+  <data name="Settings_LangEn" xml:space="preserve"><value>English</value></data>
+  <data name="Settings_LangZh" xml:space="preserve"><value>简体中文</value></data>
+  <data name="Settings_LanguageHint" xml:space="preserve"><value>已保存在本机。退出并重新打开应用后，新语言才会生效。</value></data>
+  <data name="Settings_RestartTitle" xml:space="preserve"><value>需要重启</value></data>
+  <data name="Settings_RestartMsg" xml:space="preserve"><value>界面语言仅在重启后生效。是否立即退出，以便用新语言重新打开？</value></data>
+  <data name="Settings_AboutTitle" xml:space="preserve"><value>关于软件</value></data>
+  <data name="Settings_AboutSub" xml:space="preserve"><value>XopProtector · 支持 Android APK（本地引擎）</value></data>
+  <data name="Settings_Product" xml:space="preserve"><value>产品</value></data>
+  <data name="Settings_EngineJar" xml:space="preserve"><value>引擎 jar</value></data>
+  <data name="Settings_ShellFiles" xml:space="preserve"><value>shell-files</value></data>
+  <data name="Settings_Java" xml:space="preserve"><value>Java</value></data>
+  <data name="Settings_AboutBlurb" xml:space="preserve"><value>打包引擎运行在本机 JVM；加固后的壳（ProxyApplication / libprotector.so）在 Android 设备上执行。</value></data>
+  <data name="Msg_UnhandledError" xml:space="preserve"><value>发生未处理错误，操作已中止：\n\n{0}: {1}</value></data>
+  <data name="Msg_PathEmpty" xml:space="preserve"><value>路径为空。</value></data>
+  <data name="Msg_DirMissing" xml:space="preserve"><value>输出目录不存在或已被移动。\n{0}</value></data>
+  <data name="Msg_DirMissingShort" xml:space="preserve"><value>输出目录不存在或已被移动。</value></data>
+  <data name="Msg_ExplorerFailed" xml:space="preserve"><value>无法打开资源管理器：\n{0}</value></data>
+  <data name="Ks_FileMissing" xml:space="preserve"><value>Keystore 文件不存在。</value></data>
+  <data name="Ks_PassEmpty" xml:space="preserve"><value>Store 密码不能为空。</value></data>
+  <data name="Ks_NoKeytool" xml:space="preserve"><value>未找到 keytool（engine/runtime）。</value></data>
+  <data name="Ks_StartFailed" xml:space="preserve"><value>无法启动 keytool。</value></data>
+  <data name="Ks_BadPassword" xml:space="preserve"><value>Keystore 密码不正确。\n（提示：文件虽名为 .jks，实际可能是 PKCS12）</value></data>
+  <data name="Ks_OpenFailed" xml:space="preserve"><value>无法打开 Keystore：\n{0}</value></data>
+  <data name="Ks_AliasMissing" xml:space="preserve"><value>Alias "{0}" 不存在。\n可用 Alias：{1}</value></data>
+  <data name="Ks_ProbeFailed" xml:space="preserve"><value>校验 Keystore 失败：\n{0}</value></data>
+  <data name="Dlg_SelectApkTitle" xml:space="preserve"><value>选择 APK</value></data>
+  <data name="Dlg_SaveApkTitle" xml:space="preserve"><value>保存加固后的 APK</value></data>
+  <data name="Dlg_BrowseKeystoreTitle" xml:space="preserve"><value>选择 Keystore</value></data>
+  <data name="Dlg_FilterApk" xml:space="preserve"><value>Android APK (*.apk)|*.apk</value></data>
+  <data name="Dlg_FilterKeystore" xml:space="preserve"><value>密钥库 (*.jks;*.keystore;*.p12;*.pfx)|*.jks;*.keystore;*.p12;*.pfx|所有文件 (*.*)|*.*</value></data>
+  <data name="Dlg_FilterPinCerts" xml:space="preserve"><value>证书钉扎列表 (*.txt;*.pins)|*.txt;*.pins|所有文件 (*.*)|*.*</value></data>
+  <data name="Log_ErrorPrefix" xml:space="preserve"><value>错误：</value></data>
+  <data name="Log_SizeReport" xml:space="preserve"><value>体积报告：{0}</value></data>
+  <data name="Log_OpenFailed" xml:space="preserve"><value>[日志] 无法打开日志文件：{0}</value></data>
+  <data name="Meta_Profile" xml:space="preserve"><value>策略={0}</value></data>
+  <data name="Meta_SoOn" xml:space="preserve"><value>SO={0}</value></data>
+  <data name="Meta_SoOff" xml:space="preserve"><value>SO=关</value></data>
+  <data name="Meta_Vmp" xml:space="preserve"><value>VMP=支付:{0}/行业:{1}</value></data>
+  <data name="Meta_On" xml:space="preserve"><value>开</value></data>
+  <data name="Meta_Off" xml:space="preserve"><value>关</value></data>
+  <data name="Meta_Assets" xml:space="preserve"><value>assets</value></data>
+  <data name="Meta_Res" xml:space="preserve"><value>res</value></data>
+  <data name="Meta_Proxy" xml:space="preserve"><value>代理</value></data>
+  <data name="Meta_Channel" xml:space="preserve"><value>渠道={0}</value></data>
+  <data name="Meta_Signed" xml:space="preserve"><value>已签名</value></data>
+  <data name="Meta_Unsigned" xml:space="preserve"><value>未签名</value></data>
+  <data name="Meta_ExitCode" xml:space="preserve"><value>退出码 {0}</value></data>
+  <data name="Report_SizeReportName" xml:space="preserve"><value>体积报告</value></data>
+  <data name="Reports_DetailMeta" xml:space="preserve"><value>{0}  ·  策略={1}  ·  SO={2}  ·  {3}  ·  {4}</value></data>
+</root>

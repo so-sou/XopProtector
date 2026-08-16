@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">protector-demo</string>
+    <string name="status_pass">通过</string>
+    <string name="status_fail">失败</string>
+    <string name="status_error">错误：%1$s</string>
+</resources>

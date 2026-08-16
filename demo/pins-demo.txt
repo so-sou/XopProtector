@@ -1,0 +1,4 @@
+# demo leaf-cert pins (placeholder — replace with real server leaf SHA-256)
+# Format: 64 hex chars per line (optional sha256/ prefix). Used only to exercise NetGuard load.
+# This is NOT a real production pin.
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

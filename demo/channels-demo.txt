@@ -1,0 +1,4 @@
+# Sample channels for batch stamp (demo)
+huawei
+xiaomi
+oppo

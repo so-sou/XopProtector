@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+
+
+  <PropertyGroup>
+
+    <OutputType>WinExe</OutputType>
+
+    <TargetFramework>net7.0-windows</TargetFramework>
+
+    <Nullable>enable</Nullable>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <UseWPF>true</UseWPF>
+
+    <AssemblyName>XopProtector</AssemblyName>
+
+    <RootNamespace>Protector.Desktop</RootNamespace>
+
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+
+    <Product>XopProtector</Product>
+
+    <AssemblyTitle>XopProtector</AssemblyTitle>
+
+    <Description>XopProtector — local Android APK protection</Description>
+
+    <Version>0.6.26</Version>
+
+    <FileVersion>0.6.26.0</FileVersion>
+
+    <InformationalVersion>0.6.26</InformationalVersion>
+
+  </PropertyGroup>
+
+
+
+  <ItemGroup>
+
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="8.0.0" />
+
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+
+    <None Include="Assets\app.ico" />
+
+  </ItemGroup>
+
+
+
+</Project>
+

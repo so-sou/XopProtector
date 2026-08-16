@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="ProductName" xml:space="preserve"><value>XopProtector</value></data>
+  <data name="EngineReady" xml:space="preserve"><value>Engine ready</value></data>
+  <data name="EngineLocal" xml:space="preserve"><value> · Local engine</value></data>
+  <data name="EnginePrefix" xml:space="preserve"><value>Engine </value></data>
+  <data name="EngineNotFound" xml:space="preserve"><value>Engine not found</value></data>
+  <data name="TooltipMinimize" xml:space="preserve"><value>Minimize</value></data>
+  <data name="TooltipMaximize" xml:space="preserve"><value>Maximize</value></data>
+  <data name="TooltipRestore" xml:space="preserve"><value>Restore</value></data>
+  <data name="TooltipClose" xml:space="preserve"><value>Close</value></data>
+  <data name="Nav_Harden" xml:space="preserve"><value>App protection</value></data>
+  <data name="Nav_HardenSub" xml:space="preserve"><value>Protect</value></data>
+  <data name="Nav_History" xml:space="preserve"><value>History</value></data>
+  <data name="Nav_HistorySub" xml:space="preserve"><value>History</value></data>
+  <data name="Nav_Reports" xml:space="preserve"><value>Reports</value></data>
+  <data name="Nav_ReportsSub" xml:space="preserve"><value>Reports</value></data>
+  <data name="Nav_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav_SettingsSub" xml:space="preserve"><value>Settings</value></data>
+  <data name="Harden_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Harden_SelectAppFirst" xml:space="preserve"><value>Select an APK first</value></data>
+  <data name="Harden_OpenFolder" xml:space="preserve"><value>Open folder</value></data>
+  <data name="Harden_Reset" xml:space="preserve"><value>Harden again</value></data>
+  <data name="Harden_Step1Title" xml:space="preserve"><value>Select app</value></data>
+  <data name="Harden_Step1Sub" xml:space="preserve"><value>Android APK (local engine)</value></data>
+  <data name="Harden_DropHint" xml:space="preserve"><value>Drop a file here, or click to browse</value></data>
+  <data name="Harden_FileLimit" xml:space="preserve"><value>Max size: 2 GB  |  Format: .apk</value></data>
+  <data name="Harden_Step2Title" xml:space="preserve"><value>Protection policy</value></data>
+  <data name="Harden_Step2Sub" xml:space="preserve"><value>Choose a profile for your app</value></data>
+  <data name="Harden_ProfileTitle" xml:space="preserve"><value>Profile</value></data>
+  <data name="Harden_Recommended" xml:space="preserve"><value>Recommended</value></data>
+  <data name="Harden_ProfileSub" xml:space="preserve"><value>Balance strength and performance (industry = tools preset; auto-VMP in Advanced)</value></data>
+  <data name="Harden_ProfileHint" xml:space="preserve"><value>Industry preset: enables industry auto True-VMP and larger SO budget by default. Adjust under Advanced.</value></data>
+  <data name="Profile_Balanced" xml:space="preserve"><value>Balanced</value></data>
+  <data name="Profile_Industry" xml:space="preserve"><value>Industry</value></data>
+  <data name="Profile_Perf" xml:space="preserve"><value>Performance</value></data>
+  <data name="Profile_Aggressive" xml:space="preserve"><value>Aggressive</value></data>
+  <data name="Profile_Max" xml:space="preserve"><value>Maximum</value></data>
+  <data name="SoMode_Safe" xml:space="preserve"><value>Safe</value></data>
+  <data name="SoMode_Aggressive" xml:space="preserve"><value>Aggressive</value></data>
+  <data name="SoMode_Max" xml:space="preserve"><value>Maximum</value></data>
+  <data name="Harden_SoTitle" xml:space="preserve"><value>SO library protect</value></data>
+  <data name="Harden_SoSub" xml:space="preserve"><value>Business SO .text RC4 encryption</value></data>
+  <data name="Harden_SoModeTitle" xml:space="preserve"><value>SO mode</value></data>
+  <data name="Harden_SoModeSub" xml:space="preserve"><value>Security vs compatibility (recommended)</value></data>
+  <data name="Harden_AdvancedTitle" xml:space="preserve"><value>Advanced options</value></data>
+  <data name="Harden_AdvancedSub" xml:space="preserve"><value>Auto True-VMP, prefixes, SO budget, assets/res/channel/NetGuard</value></data>
+  <data name="Harden_AutoVmpSection" xml:space="preserve"><value>Auto True-VMP</value></data>
+  <data name="Harden_PaymentAutoVmp" xml:space="preserve"><value>Payment SDK callbacks (PaymentVmpRules)</value></data>
+  <data name="Harden_IndustryAutoVmp" xml:space="preserve"><value>Industry sensitive types (IndustryVmpRules)</value></data>
+  <data name="Harden_AutoVmpSlowTip" xml:space="preserve"><value>Many hits (esp. industry auto) can make protection much slower.</value></data>
+  <data name="Harden_SoBudgetSection" xml:space="preserve"><value>SO size budget</value></data>
+  <data name="Harden_SoBudgetHintDefault" xml:space="preserve"><value>Leave empty to use engine defaults (12 / 8 MB).</value></data>
+  <data name="Harden_SoBudgetHintIndustry" xml:space="preserve"><value>Leave empty to use industry defaults (48 / 24 MB).</value></data>
+  <data name="Harden_SoBudgetMb" xml:space="preserve"><value>Budget (MB)</value></data>
+  <data name="Harden_SoMaxFileMb" xml:space="preserve"><value>Max file (MB)</value></data>
+  <data name="Harden_SoBudgetTip" xml:space="preserve"><value>Optional. Overrides --protect-so-budget-mb</value></data>
+  <data name="Harden_SoMaxFileTip" xml:space="preserve"><value>Optional. Overrides --protect-so-max-file-mb</value></data>
+  <data name="Harden_ResetAdvanced" xml:space="preserve"><value>Reset advanced to profile defaults</value></data>
+  <data name="Harden_ExtraProtectSection" xml:space="preserve"><value>Extra protect</value></data>
+  <data name="Harden_EncryptAssets" xml:space="preserve"><value>Encrypt assets/**</value></data>
+  <data name="Harden_EncryptAssetsTip" xml:space="preserve"><value>AES-GCM assets into protector/aenc (default off)</value></data>
+  <data name="Harden_ResProtect" xml:space="preserve"><value>Resource path obfuscation</value></data>
+  <data name="Harden_ResProtectTip" xml:space="preserve"><value>Shorten res/ paths and rewrite resources.arsc (default off)</value></data>
+  <data name="Harden_DetectProxy" xml:space="preserve"><value>Detect proxy / VPN (NetGuard)</value></data>
+  <data name="Harden_DetectProxyTip" xml:space="preserve"><value>Enable proxy/VPN heuristics at runtime</value></data>
+  <data name="Harden_PinCerts" xml:space="preserve"><value>Cert pin file (optional)</value></data>
+  <data name="Harden_PinCertsTip" xml:space="preserve"><value>Leaf cert SHA-256 hex pins, one per line</value></data>
+  <data name="Harden_BrowsePinCerts" xml:space="preserve"><value>Browse pin-certs file</value></data>
+  <data name="Harden_PinCertsMissing" xml:space="preserve"><value>Pin-certs file not found.</value></data>
+  <data name="Harden_Channel" xml:space="preserve"><value>Channel id</value></data>
+  <data name="Harden_ChannelTip" xml:space="preserve"><value>Walle-compatible channel stamped after sign</value></data>
+  <data name="Harden_ChannelNeedSign" xml:space="preserve"><value>Requires custom signing (keystore).</value></data>
+  <data name="Harden_ChannelNeedSignWarn" xml:space="preserve"><value>Channel requires custom signing. Enable signing in step 3 or clear the channel field.</value></data>
+  <data name="Harden_PrefixSection" xml:space="preserve"><value>Method prefixes (optional)</value></data>
+  <data name="Harden_HollowPrefix" xml:space="preserve"><value>Hollow prefixes</value></data>
+  <data name="Harden_HollowPrefixTip" xml:space="preserve"><value>Allowlist type prefixes for hollow; separate with ; or newlines</value></data>
+  <data name="Harden_Vmp1Prefix" xml:space="preserve"><value>VMP1 prefixes</value></data>
+  <data name="Harden_Vmp1PrefixTip" xml:space="preserve"><value>PVM1 pack (decode→DEX); separate with ; or newlines</value></data>
+  <data name="Harden_Step3Title" xml:space="preserve"><value>Signing</value></data>
+  <data name="Harden_Step3Sub" xml:space="preserve"><value>Choose how to sign</value></data>
+  <data name="Harden_OutputPath" xml:space="preserve"><value>Output path</value></data>
+  <data name="Harden_BrowseOutput" xml:space="preserve"><value>Browse output path</value></data>
+  <data name="Harden_TrueVmpPrefix" xml:space="preserve"><value>True-VMP prefixes</value></data>
+  <data name="Harden_TrueVmpTip" xml:space="preserve"><value>Optional; separate multiple prefixes with ; e.g. Lcom/foo/pay/;</value></data>
+  <data name="Harden_TrueVmpExample" xml:space="preserve"><value>e.g. Lcom/foo/pay/;</value></data>
+  <data name="Harden_Step4Title" xml:space="preserve"><value>Output</value></data>
+  <data name="Harden_Step4Sub" xml:space="preserve"><value>Configure output options</value></data>
+  <data name="Harden_SignNone" xml:space="preserve"><value>No signing (default)</value></data>
+  <data name="Harden_SignCustom" xml:space="preserve"><value>Custom signing</value></data>
+  <data name="Harden_KeystorePath" xml:space="preserve"><value>Keystore path</value></data>
+  <data name="Harden_BrowseKeystore" xml:space="preserve"><value>Browse keystore</value></data>
+  <data name="Harden_StorePass" xml:space="preserve"><value>Store password</value></data>
+  <data name="Harden_Alias" xml:space="preserve"><value>Alias</value></data>
+  <data name="Harden_AliasTip" xml:space="preserve"><value>Certificate alias (auto-detected after password)</value></data>
+  <data name="Harden_KeyPass" xml:space="preserve"><value>Key password</value></data>
+  <data name="Harden_KeyPassOptional" xml:space="preserve"><value>(optional; defaults to store password)</value></data>
+  <data name="Harden_KeyPassTip" xml:space="preserve"><value>Key password (optional)</value></data>
+  <data name="Harden_EmptyTitle" xml:space="preserve"><value>Upload an APK to start</value></data>
+  <data name="Harden_EmptySub" xml:space="preserve"><value>Progress and logs appear here</value></data>
+  <data name="Harden_PhaseReady" xml:space="preserve"><value>Ready</value></data>
+  <data name="Harden_Success" xml:space="preserve"><value>Protection succeeded</value></data>
+  <data name="Harden_InstallTest" xml:space="preserve"><value>Install &amp; launch</value></data>
+  <data name="Harden_Installing" xml:space="preserve"><value>Installing…</value></data>
+  <data name="Harden_SelectDeviceTip" xml:space="preserve"><value>USB device for install test</value></data>
+  <data name="Harden_InstallOk" xml:space="preserve"><value>Installed and launched on {0}</value></data>
+  <data name="Harden_InstallOkNoLaunch" xml:space="preserve"><value>Installed on {0}, but launch failed:\n{1}</value></data>
+  <data name="Harden_InstallFail" xml:space="preserve"><value>Install failed:\n{0}</value></data>
+  <data name="Harden_AdbMissing" xml:space="preserve"><value>adb not found. Install Android platform-tools or add adb to PATH.</value></data>
+  <data name="Harden_ApkMissing" xml:space="preserve"><value>Protected APK not found:\n{0}</value></data>
+  <data name="Harden_NoDeviceSelected" xml:space="preserve"><value>Select a USB device first.</value></data>
+  <data name="Harden_ExecLog" xml:space="preserve"><value>Execution log</value></data>
+  <data name="Harden_CopyLog" xml:space="preserve"><value>Copy</value></data>
+  <data name="Harden_CopyLogTip" xml:space="preserve"><value>Copy selection (or all) to clipboard. You can also select text in the log and Ctrl+C.</value></data>
+  <data name="Harden_SelectAllLog" xml:space="preserve"><value>Select all</value></data>
+  <data name="Harden_OpenLog" xml:space="preserve"><value>Open log</value></data>
+  <data name="Harden_OpenLogTip" xml:space="preserve"><value>Open the saved log file</value></data>
+  <data name="Harden_NoLogYet" xml:space="preserve"><value>No log file yet. Start a protect job first.</value></data>
+  <data name="Harden_LogSavedBeside" xml:space="preserve"><value>Log saved: {0}</value></data>
+  <data name="Harden_LogSavedAppData" xml:space="preserve"><value>Log saved: {0}</value></data>
+  <data name="Harden_Start" xml:space="preserve"><value>Start protection</value></data>
+  <data name="Harden_EngineNotReady" xml:space="preserve"><value>Engine not ready</value></data>
+  <data name="Harden_RestoredSign" xml:space="preserve"><value>Restored previous signing settings</value></data>
+  <data name="Harden_Resolving" xml:space="preserve"><value>Detecting…</value></data>
+  <data name="Harden_ResolveFailed" xml:space="preserve"><value>Could not detect</value></data>
+  <data name="Harden_NoAlias" xml:space="preserve"><value>No alias found</value></data>
+  <data name="Harden_AutoDetected" xml:space="preserve"><value>Auto-detected</value></data>
+  <data name="Harden_MultiAlias" xml:space="preserve"><value>Multiple aliases; selected the first (editable): </value></data>
+  <data name="Harden_NeedSignFields" xml:space="preserve"><value>Custom signing requires keystore, alias, and store password.</value></data>
+  <data name="Harden_AliasMismatch" xml:space="preserve"><value>Alias mismatch</value></data>
+  <data name="Harden_UseAlias" xml:space="preserve"><value>Use the only alias "{0}"?</value></data>
+  <data name="Harden_KeystoreCheckFailed" xml:space="preserve"><value>Keystore validation failed.</value></data>
+  <data name="Harden_SetOutput" xml:space="preserve"><value>Please set an output path.</value></data>
+  <data name="Harden_PhaseRunning" xml:space="preserve"><value>Protecting…</value></data>
+  <data name="Harden_LogStart" xml:space="preserve"><value>Starting protection: </value></data>
+  <data name="Harden_PhaseDone" xml:space="preserve"><value>Completed</value></data>
+  <data name="Harden_OutputDir" xml:space="preserve"><value>Output folder: </value></data>
+  <data name="Harden_LogDone" xml:space="preserve"><value>Protection finished; output saved. Total time: {0} min</value></data>
+  <data name="Harden_PhaseFailed" xml:space="preserve"><value>Failed (exit {0})</value></data>
+  <data name="Harden_LogExit" xml:space="preserve"><value>Engine exit code {0}</value></data>
+  <data name="Harden_PhaseCancelled" xml:space="preserve"><value>Cancelled</value></data>
+  <data name="Harden_LogCancelled" xml:space="preserve"><value>Protection cancelled.</value></data>
+  <data name="Harden_PhaseError" xml:space="preserve"><value>Error</value></data>
+  <data name="Harden_Cancelling" xml:space="preserve"><value>Cancelling…</value></data>
+  <data name="Stage_Unzip" xml:space="preserve"><value>Parse package</value></data>
+  <data name="Stage_Hollow" xml:space="preserve"><value>DEX protect</value></data>
+  <data name="Stage_ProtectSo" xml:space="preserve"><value>SO protect</value></data>
+  <data name="Stage_Manifest" xml:space="preserve"><value>Inject runtime</value></data>
+  <data name="Stage_Repack" xml:space="preserve"><value>Repack resources</value></data>
+  <data name="Stage_Sign" xml:space="preserve"><value>Re-sign</value></data>
+  <data name="Stage_Done" xml:space="preserve"><value>Verify output</value></data>
+  <data name="History_Title" xml:space="preserve"><value>Protection history</value></data>
+  <data name="History_Count" xml:space="preserve"><value>{0} total</value></data>
+  <data name="History_Sub" xml:space="preserve"><value>Local job records under %AppData%\XopProtector</value></data>
+  <data name="History_FilterAll" xml:space="preserve"><value>All</value></data>
+  <data name="History_FilterDone" xml:space="preserve"><value>Success</value></data>
+  <data name="History_FilterFailed" xml:space="preserve"><value>Failed</value></data>
+  <data name="History_Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="History_Empty" xml:space="preserve"><value>No history yet</value></data>
+  <data name="History_EmptyHint" xml:space="preserve"><value>Completed jobs from App harden appear here</value></data>
+  <data name="History_ConfirmClear" xml:space="preserve"><value>Clear all protection history?</value></data>
+  <data name="History_StatusDone" xml:space="preserve"><value>Success</value></data>
+  <data name="History_StatusFailed" xml:space="preserve"><value>Failed</value></data>
+  <data name="Reports_Title" xml:space="preserve"><value>Security reports</value></data>
+  <data name="Reports_Count" xml:space="preserve"><value>{0} reports</value></data>
+  <data name="Reports_Empty" xml:space="preserve"><value>No reports</value></data>
+  <data name="Reports_EmptyHint" xml:space="preserve"><value>Generated after a successful protect job</value></data>
+  <data name="Reports_ScoreUnit" xml:space="preserve"><value>pts</value></data>
+  <data name="Reports_EmptyDetail" xml:space="preserve"><value>Select a report on the left</value></data>
+  <data name="Reports_EmptyDetailHint" xml:space="preserve"><value>Local summary from policy and size_report</value></data>
+  <data name="Reports_Pass" xml:space="preserve"><value>Pass</value></data>
+  <data name="Reports_Warn" xml:space="preserve"><value>Warn</value></data>
+  <data name="Reports_Fail" xml:space="preserve"><value>Fail</value></data>
+  <data name="Reports_OpenSizeReport" xml:space="preserve"><value>Open size_report</value></data>
+  <data name="Reports_OpenOutput" xml:space="preserve"><value>Open output folder</value></data>
+  <data name="Reports_NoSizeReport" xml:space="preserve"><value>size_report.json not found.</value></data>
+  <data name="Reports_CannotOpen" xml:space="preserve"><value>Cannot open file:\n</value></data>
+  <data name="Reports_NoOutput" xml:space="preserve"><value>No output path.</value></data>
+  <data name="Report_ScoreExcellent" xml:space="preserve"><value>Excellent</value></data>
+  <data name="Report_ScoreGood" xml:space="preserve"><value>Good</value></data>
+  <data name="Report_ScoreImprove" xml:space="preserve"><value>Needs work</value></data>
+  <data name="Report_SizeSummary" xml:space="preserve"><value>In {0:F2} MB → Out {1:F2} MB (Δ {2:+0.00;-0.00} MB / {3:+0.0;-0.0}%)</value></data>
+  <data name="Report_CatCode" xml:space="preserve"><value>Code protection</value></data>
+  <data name="Report_DexProtect" xml:space="preserve"><value>DEX protect</value></data>
+  <data name="Report_DexProtectDetail" xml:space="preserve"><value>Shell DEX extraction / protection applied (packer hollow)</value></data>
+  <data name="Report_ProfileCheck" xml:space="preserve"><value>Profile</value></data>
+  <data name="Report_ProfileDetail" xml:space="preserve"><value>Current profile: {0}</value></data>
+  <data name="Report_SoOnDetail" xml:space="preserve"><value>Business SO .text encryption enabled (mode {0})</value></data>
+  <data name="Report_SoOffDetail" xml:space="preserve"><value>SO protect disabled; native risk is higher</value></data>
+  <data name="Report_ShellInject" xml:space="preserve"><value>Shell asset inject</value></data>
+  <data name="Report_ShellInjectDetail" xml:space="preserve"><value>Runtime shell files and protector assets written to the output APK</value></data>
+  <data name="Report_CatSign" xml:space="preserve"><value>Signing and output</value></data>
+  <data name="Report_CustomSign" xml:space="preserve"><value>Custom signing</value></data>
+  <data name="Report_CustomSignDetail" xml:space="preserve"><value>Signed with a custom keystore</value></data>
+  <data name="Report_AppSign" xml:space="preserve"><value>App signing</value></data>
+  <data name="Report_AppSignWarn" xml:space="preserve"><value>Not signed after protect; sign before install/release</value></data>
+  <data name="Report_OutputArtifact" xml:space="preserve"><value>Output artifact</value></data>
+  <data name="Report_NoOutputPath" xml:space="preserve"><value>No output path</value></data>
+  <data name="Report_Duration" xml:space="preserve"><value>Duration</value></data>
+  <data name="Report_CatVolume" xml:space="preserve"><value>Size and SO decisions</value></data>
+  <data name="Report_SizeReportMissing" xml:space="preserve"><value>size_report.json not found; showing job summary only</value></data>
+  <data name="Report_PkgSize" xml:space="preserve"><value>Package size</value></data>
+  <data name="Report_PkgSizeChange" xml:space="preserve"><value>Package size change</value></data>
+  <data name="Report_PkgSizeChangeDetail" xml:space="preserve"><value>{0:F2} MB → {1:F2} MB (Δ {2:+0.00;-0.00} MB)</value></data>
+  <data name="Report_SoEncrypt" xml:space="preserve"><value>SO encryption</value></data>
+  <data name="Report_SoEncryptedCount" xml:space="preserve"><value>Encrypted {0} SO(s)</value></data>
+  <data name="Report_SoEncryptEmpty" xml:space="preserve"><value>SO protect on but no encrypted entries</value></data>
+  <data name="Report_SoEncryptOff" xml:space="preserve"><value>size_report shows SO protect off</value></data>
+  <data name="Report_Budget" xml:space="preserve"><value>Size budget</value></data>
+  <data name="Report_BudgetHit" xml:space="preserve"><value>Budget truncate (so_skipped_budget); some SOs skipped</value></data>
+  <data name="Report_BudgetOk" xml:space="preserve"><value>Budget truncate not triggered</value></data>
+  <data name="Report_PolicySkip" xml:space="preserve"><value>Policy skip</value></data>
+  <data name="Report_PolicySkipDetail" xml:space="preserve"><value>{0} SO(s) skipped by policy</value></data>
+  <data name="Report_RelocSkip" xml:space="preserve"><value>Reloc skip</value></data>
+  <data name="Report_RelocSkipDetail" xml:space="preserve"><value>{0} SO(s) skipped due to reloc</value></data>
+  <data name="Report_BudgetSkip" xml:space="preserve"><value>Budget skip</value></data>
+  <data name="Report_BudgetSkipDetail" xml:space="preserve"><value>{0} SO(s) skipped by budget</value></data>
+  <data name="Report_AssetsOnDetail" xml:space="preserve"><value>App assets encrypted under protector/aenc</value></data>
+  <data name="Report_AssetsOffDetail" xml:space="preserve"><value>Assets encryption not enabled</value></data>
+  <data name="Report_ResOnDetail" xml:space="preserve"><value>res/ paths shortened and resources.arsc rewritten</value></data>
+  <data name="Report_ResOffDetail" xml:space="preserve"><value>Resource path obfuscation not enabled</value></data>
+  <data name="Report_AutoVmp" xml:space="preserve"><value>Auto True-VMP</value></data>
+  <data name="Report_AutoVmpDetail" xml:space="preserve"><value>Payment={0}, Industry={1}</value></data>
+  <data name="Report_AutoVmpOffDetail" xml:space="preserve"><value>Payment and Industry auto True-VMP both off</value></data>
+  <data name="Settings_Title" xml:space="preserve"><value>Settings</value></data>
+  <data name="Settings_TabAppearance" xml:space="preserve"><value>Appearance</value></data>
+  <data name="Settings_TabLanguage" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings_TabAbout" xml:space="preserve"><value>About / Engine</value></data>
+  <data name="Settings_AppearanceTitle" xml:space="preserve"><value>Appearance</value></data>
+  <data name="Settings_AppearanceSub" xml:space="preserve"><value>Choose dark or light theme (dark by default)</value></data>
+  <data name="Settings_Theme" xml:space="preserve"><value>Theme</value></data>
+  <data name="Settings_ThemeDark" xml:space="preserve"><value>Dark</value></data>
+  <data name="Settings_ThemeLight" xml:space="preserve"><value>Light</value></data>
+  <data name="Settings_ThemeHint" xml:space="preserve"><value>Theme preference is saved locally and restored on next launch.</value></data>
+  <data name="Settings_LanguageTitle" xml:space="preserve"><value>Language</value></data>
+  <data name="Settings_LanguageSub" xml:space="preserve"><value>UI language (restart required after change)</value></data>
+  <data name="Settings_LangSystem" xml:space="preserve"><value>Follow system</value></data>
+  <data name="Settings_LangEn" xml:space="preserve"><value>English</value></data>
+  <data name="Settings_LangZh" xml:space="preserve"><value>简体中文</value></data>
+  <data name="Settings_LanguageHint" xml:space="preserve"><value>Saved locally. Quit and relaunch the app to apply the new language.</value></data>
+  <data name="Settings_RestartTitle" xml:space="preserve"><value>Restart required</value></data>
+  <data name="Settings_RestartMsg" xml:space="preserve"><value>UI language applies only after restart. Quit now to relaunch in the new language?</value></data>
+  <data name="Settings_AboutTitle" xml:space="preserve"><value>About</value></data>
+  <data name="Settings_AboutSub" xml:space="preserve"><value>XopProtector · Android APK (local engine)</value></data>
+  <data name="Settings_Product" xml:space="preserve"><value>Product</value></data>
+  <data name="Settings_EngineJar" xml:space="preserve"><value>Engine jar</value></data>
+  <data name="Settings_ShellFiles" xml:space="preserve"><value>shell-files</value></data>
+  <data name="Settings_Java" xml:space="preserve"><value>Java</value></data>
+  <data name="Settings_AboutBlurb" xml:space="preserve"><value>The packer runs on the local JVM; the shell (ProxyApplication / libprotector.so) runs on the Android device.</value></data>
+  <data name="Msg_UnhandledError" xml:space="preserve"><value>An unexpected error occurred; the operation was aborted:\n\n{0}: {1}</value></data>
+  <data name="Msg_PathEmpty" xml:space="preserve"><value>Path is empty.</value></data>
+  <data name="Msg_DirMissing" xml:space="preserve"><value>Output folder does not exist or was moved.\n{0}</value></data>
+  <data name="Msg_DirMissingShort" xml:space="preserve"><value>Output folder does not exist or was moved.</value></data>
+  <data name="Msg_ExplorerFailed" xml:space="preserve"><value>Cannot open Explorer:\n{0}</value></data>
+  <data name="Ks_FileMissing" xml:space="preserve"><value>Keystore file not found.</value></data>
+  <data name="Ks_PassEmpty" xml:space="preserve"><value>Store password cannot be empty.</value></data>
+  <data name="Ks_NoKeytool" xml:space="preserve"><value>keytool not found (engine/runtime).</value></data>
+  <data name="Ks_StartFailed" xml:space="preserve"><value>Failed to start keytool.</value></data>
+  <data name="Ks_BadPassword" xml:space="preserve"><value>Incorrect keystore password.\n(Tip: a .jks file may actually be PKCS12)</value></data>
+  <data name="Ks_OpenFailed" xml:space="preserve"><value>Cannot open keystore:\n{0}</value></data>
+  <data name="Ks_AliasMissing" xml:space="preserve"><value>Alias "{0}" not found.\nAvailable: {1}</value></data>
+  <data name="Ks_ProbeFailed" xml:space="preserve"><value>Keystore check failed:\n{0}</value></data>
+  <data name="Dlg_SelectApkTitle" xml:space="preserve"><value>Select APK</value></data>
+  <data name="Dlg_SaveApkTitle" xml:space="preserve"><value>Save protected APK</value></data>
+  <data name="Dlg_BrowseKeystoreTitle" xml:space="preserve"><value>Select keystore</value></data>
+  <data name="Dlg_FilterApk" xml:space="preserve"><value>Android APK (*.apk)|*.apk</value></data>
+  <data name="Dlg_FilterKeystore" xml:space="preserve"><value>Keystore (*.jks;*.keystore;*.p12;*.pfx)|*.jks;*.keystore;*.p12;*.pfx|All files (*.*)|*.*</value></data>
+  <data name="Dlg_FilterPinCerts" xml:space="preserve"><value>Pin list (*.txt;*.pins)|*.txt;*.pins|All files (*.*)|*.*</value></data>
+  <data name="Log_ErrorPrefix" xml:space="preserve"><value>ERROR: </value></data>
+  <data name="Log_SizeReport" xml:space="preserve"><value>Size report: {0}</value></data>
+  <data name="Log_OpenFailed" xml:space="preserve"><value>[log] failed to open log file: {0}</value></data>
+  <data name="Meta_Profile" xml:space="preserve"><value>profile={0}</value></data>
+  <data name="Meta_SoOn" xml:space="preserve"><value>so={0}</value></data>
+  <data name="Meta_SoOff" xml:space="preserve"><value>so=off</value></data>
+  <data name="Meta_Vmp" xml:space="preserve"><value>vmp=pay:{0}/ind:{1}</value></data>
+  <data name="Meta_On" xml:space="preserve"><value>on</value></data>
+  <data name="Meta_Off" xml:space="preserve"><value>off</value></data>
+  <data name="Meta_Assets" xml:space="preserve"><value>assets</value></data>
+  <data name="Meta_Res" xml:space="preserve"><value>res</value></data>
+  <data name="Meta_Proxy" xml:space="preserve"><value>proxy</value></data>
+  <data name="Meta_Channel" xml:space="preserve"><value>ch={0}</value></data>
+  <data name="Meta_Signed" xml:space="preserve"><value>signed</value></data>
+  <data name="Meta_Unsigned" xml:space="preserve"><value>unsigned</value></data>
+  <data name="Meta_ExitCode" xml:space="preserve"><value>exit {0}</value></data>
+  <data name="Report_SizeReportName" xml:space="preserve"><value>size_report</value></data>
+  <data name="Reports_DetailMeta" xml:space="preserve"><value>{0}  ·  profile={1}  ·  so={2}  ·  {3}  ·  {4}</value></data>
+</root>

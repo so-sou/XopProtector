@@ -1,0 +1,12 @@
+blank_issues_enabled: true
+contact_links:
+  # TODO: replace OWNER/REPO with your GitHub org/repo before going public
+  - name: Security vulnerability
+    url: https://github.com/OWNER/REPO/security/advisories/new
+    about: Do not open a public issue for security bypasses. Prefer private advisories or email xopJack@163.com (see SECURITY.md).
+  - name: Documentation (English)
+    url: https://github.com/OWNER/REPO/blob/main/README.md
+    about: Build, CLI, and desktop docs
+  - name: Documentation (中文)
+    url: https://github.com/OWNER/REPO/blob/main/README.zh-CN.md
+    about: Chinese quick start and module overview

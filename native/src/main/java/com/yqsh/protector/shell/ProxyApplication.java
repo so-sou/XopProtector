@@ -1,0 +1,433 @@
+package com.yqsh.protector.shell;
+
+import android.app.Application;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.text.TextUtils;
+import android.util.Log;
+
+import androidx.annotation.Keep;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+@Keep
+public class ProxyApplication extends Application {
+    // Rolling-XOR encoded (Phase 4 StrEnc) — "protector.ProxyApp"
+    private static final String TAG = StrEnc.d(new byte[]{
+            0x2a, 0x33, 0x03, 0x7f, 0x53, (byte)0xbe, (byte)0x8c, (byte)0x88, (byte)0xf0, (byte)0x87,
+            0x04, 0x01, 0x71, 0x7d, 0x59, (byte)0x8e, (byte)0x9a, (byte)0xe1
+    });
+    // "protector/dexes.zip"
+    private static final String DEXES_ASSET = StrEnc.d(new byte[]{
+            0x2a, 0x33, 0x03, 0x7f, 0x53, (byte)0xbe, (byte)0x8c, (byte)0x88, (byte)0xf0, (byte)0x86,
+            0x30, 0x16, 0x66, 0x60, 0x53, (byte)0xe1, (byte)0x90, (byte)0xf8, (byte)0xcc
+    });
+    // "protector/code.bin"
+    private static final String CODE_ASSET = StrEnc.d(new byte[]{
+            0x2a, 0x33, 0x03, 0x7f, 0x53, (byte)0xbe, (byte)0x8c, (byte)0x88, (byte)0xf0, (byte)0x86,
+            0x37, 0x1c, 0x7a, 0x60, 0x0e, (byte)0xad, (byte)0x83, (byte)0xff
+    });
+    // "protector/config.json"
+    private static final String CONFIG_ASSET = StrEnc.d(new byte[]{
+            0x2a, 0x33, 0x03, 0x7f, 0x53, (byte)0xbe, (byte)0x8c, (byte)0x88, (byte)0xf0, (byte)0x86,
+            0x37, 0x1c, 0x70, 0x63, 0x49, (byte)0xa8, (byte)0xc4, (byte)0xfb, (byte)0xcf, 0x34, 0x28
+    });
+    // "protector/sokeys.bin"
+    private static final String SOKEYS_ASSET = StrEnc.d(new byte[]{
+            0x2a, 0x33, 0x03, 0x7f, 0x53, (byte)0xbe, (byte)0x8c, (byte)0x88, (byte)0xf0, (byte)0x86,
+            0x27, 0x1c, 0x75, 0x60, 0x59, (byte)0xbc, (byte)0xc4, (byte)0xf3, (byte)0xd5, 0x35
+    });
+    private static final String STAMP_FILE = ".apk_stamp";
+    // "protector"
+    private static final String CACHE_DIR = StrEnc.d(new byte[]{
+            0x2a, 0x33, 0x03, 0x7f, 0x53, (byte)0xbe, (byte)0x8c, (byte)0x88, (byte)0xf0
+    });
+    // "code.bin"
+    private static final String CODE_BIN = StrEnc.d(new byte[]{
+            0x39, 0x2e, 0x08, 0x6e, 0x18, (byte)0xbf, (byte)0x91, (byte)0x89
+    });
+    // "dexes.zip"
+    private static final String DEXES_ZIP = StrEnc.d(new byte[]{
+            0x3e, 0x24, 0x14, 0x6e, 0x45, (byte)0xf3, (byte)0x82, (byte)0x8e, (byte)0xf2
+    });
+    // "config.json"
+    private static final String CONFIG_JSON = StrEnc.d(new byte[]{
+            0x39, 0x2e, 0x02, 0x6d, 0x5f, (byte)0xba, (byte)0xd6, (byte)0x8d, (byte)0xf1, (byte)0xc6, 0x3a
+    });
+    // "sokeys.bin"
+    private static final String SOKEYS_BIN = StrEnc.d(new byte[]{
+            0x29, 0x2e, 0x07, 0x6e, 0x4f, (byte)0xae, (byte)0xd6, (byte)0x85, (byte)0xeb, (byte)0xc7
+    });
+    // "protector/netguard.json"
+    private static final String NETGUARD_ASSET = StrEnc.d(new byte[]{
+            0x2a, 0x33, 0x03, 0x7f, 0x53, (byte)0xbe, (byte)0x8c, (byte)0x88, (byte)0xf0, (byte)0x86,
+            0x3a, 0x16, 0x6a, 0x62, 0x55, (byte)0xae, (byte)0x98, (byte)0xf5, (byte)0x92, 0x31, 0x35, 0x02, 0x66
+    });
+    // "netguard.json"
+    private static final String NETGUARD_JSON = StrEnc.d(new byte[]{
+            0x34, 0x24, 0x18, 0x6c, 0x43, (byte)0xbc, (byte)0x8a, (byte)0x83, (byte)0xac, (byte)0xc3, 0x27, 0x1c, 0x70
+    });
+
+    private String realApplicationName = "";
+    private Application realApplication;
+    private boolean classLoaderReady;
+    /** True after ActivityThread/LoadedApk point at the real Application (attach done). */
+    private boolean replaced;
+    /** True after real Application.onCreate(); must not run during ContentProvider install. */
+    private boolean realOnCreateCalled;
+    private static volatile boolean heartbeatStarted;
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        try {
+            bootstrap(base);
+            classLoaderReady = true;
+            realApplicationName = safe(JniBridge.readApplicationName());
+            Log.i(TAG, "shell init done, realApp=" + realApplicationName);
+        } catch (Throwable t) {
+            Log.e(TAG, "shell init failed", t);
+            // Fail closed: a half-initialized shell leaves hollow stubs / missing
+            // business Application and is harder to diagnose than a hard crash.
+            throw new ExceptionInInitializerError(t);
+        }
+    }
+
+    /** Shared bootstrap used by Application and AppComponentFactory. */
+    public static void bootstrap(Context context) throws Exception {
+        if (!hasProtectionAssets(context)) {
+            Log.i(TAG, "no protection assets, skip shell init");
+            return;
+        }
+        File dir = ensureDexesOnDisk(context);
+        // ACF already ran heavy init — only bind Context + signature/heartbeat.
+        if (ProxyComponentFactory.isBootstrapped()) {
+            NativeLibDirRedirect.apply(context, dir);
+            JniBridge.verifySignature(context);
+            startHeartbeat();
+            try {
+                NetGuard.install(context);
+            } catch (Throwable t) {
+                Log.w(TAG, "NetGuard.install skipped", t);
+            }
+            try {
+                CrashGuard.install();
+            } catch (Throwable t) {
+                Log.w(TAG, "CrashGuard.install skipped", t);
+            }
+            return;
+        }
+        ApplicationInfo ai = context.getApplicationInfo();
+        // Packaged extract dir for JNI materialize (ciphertext source). Redirect
+        // of ApplicationInfo.nativeLibraryDir to so_plain happens after this.
+        String packagedLib = ai != null ? ai.nativeLibraryDir : null;
+        if (packagedLib != null) {
+            JniBridge.setNativeLibraryDir(packagedLib);
+        }
+        JniBridge.initApp(dir.getAbsolutePath());
+        NativeLibDirRedirect.apply(context, dir);
+        DexMerger.merge(context.getClassLoader(), dir);
+        JniBridge.finishBusinessSoDecrypt();
+        JniBridge.enableJunkVerify();
+        JniBridge.verifySignature(context);
+        startHeartbeat();
+        try {
+            NetGuard.install(context);
+        } catch (Throwable t) {
+            Log.w(TAG, "NetGuard.install skipped", t);
+        }
+        try {
+            CrashGuard.install();
+        } catch (Throwable t) {
+            Log.w(TAG, "CrashGuard.install skipped", t);
+        }
+    }
+
+    /** Periodic Java→Native heartbeat so the native risk thread
+     *  can detect Java-layer tampering (e.g. ProxyApplication swapped). */
+    private static void startHeartbeat() {
+        if (heartbeatStarted) return;
+        heartbeatStarted = true;
+        Thread t = new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(5000);
+                    JniBridge.heartbeat();
+                } catch (Throwable ignored) {
+                    // If heartbeat fails the native side will notice the
+                    // missing ping and crash the process itself.
+                }
+            }
+        }, "protector-hb");
+        t.setDaemon(true);
+        t.start();
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        replaceApplication(true);
+    }
+
+    @Override
+    public Context createPackageContext(String packageName, int flags)
+            throws PackageManager.NameNotFoundException {
+        if (!TextUtils.isEmpty(realApplicationName)) {
+            // Attach real Application for ContentProviders; defer onCreate to Application.onCreate.
+            replaceApplication(false);
+            if (realApplication != null) {
+                return realApplication;
+            }
+        }
+        return super.createPackageContext(packageName, flags);
+    }
+
+    /**
+     * Returning empty package name makes ContentProvider attach use createPackageContext path
+     * (same trick as dpt-shell), so Providers see the real Application.
+     * Only while not yet replaced — after replace Sophix may attach the real Application with
+     * this Proxy as base; an empty package name then breaks assets/classpath Properties load
+     * and triggers the app's "数据初始化异常" exit.
+     */
+    @Override
+    public String getPackageName() {
+        if (!replaced && !TextUtils.isEmpty(realApplicationName)) {
+            return "";
+        }
+        return super.getPackageName();
+    }
+
+    private void replaceApplication(boolean invokeOnCreate) {
+        if (!classLoaderReady || TextUtils.isEmpty(realApplicationName)) {
+            return;
+        }
+        try {
+            if (!replaced) {
+                // Mark replaced BEFORE makeApplication/attach so getPackageName()
+                // no longer returns "" while Sophix/real APP attachBaseContext runs.
+                // Empty package during attach breaks assets/files paths and later
+                // triggers BaseGuideActivity "数据初始化异常" + killProcess.
+                replaced = true;
+                realApplication = ApplicationReplacer.replace(realApplicationName);
+                if (realApplication == null) {
+                    replaced = false;
+                }
+            }
+            if (invokeOnCreate && realApplication != null && !realOnCreateCalled) {
+                // Providers already ran under the replaced Application. Clear the
+                // pending list so Sophix does not re-install (AutoSize InitProvider etc.).
+                ApplicationReplacer.markProvidersAlreadyInstalled();
+                invokeRealApplicationOnCreate(realApplication);
+                realOnCreateCalled = true;
+            }
+        } catch (Throwable t) {
+            Log.e(TAG, "replace real Application failed", t);
+        }
+    }
+
+    /**
+     * Invoke Application.onCreate with Sophix-compatible recovery: if Sophix
+     * still abandons on installProviders, call the business Application.onCreate
+     * that Sophix already attached (keeps packer path unified — no --application).
+     */
+    private void invokeRealApplicationOnCreate(Application app) {
+        try {
+            app.onCreate();
+            Log.i(TAG, "real Application.onCreate called: " + app.getClass().getName());
+            return;
+        } catch (Throwable t) {
+            if (!isSophixProvidersAbandon(t)) {
+                Log.e(TAG, "real Application.onCreate failed", t);
+                return;
+            }
+            Log.w(TAG, "Sophix abandoned installProviders; calling business Application.onCreate", t);
+        }
+        Application business = ApplicationReplacer.findBusinessApplication(app);
+        if (business == null) {
+            Log.e(TAG, "no business Application found after Sophix abandon");
+            return;
+        }
+        try {
+            business.onCreate();
+            Log.i(TAG, "business Application.onCreate called: " + business.getClass().getName());
+        } catch (Throwable t) {
+            Log.e(TAG, "business Application.onCreate failed", t);
+        }
+    }
+
+    private static boolean isSophixProvidersAbandon(Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            String msg = c.getMessage();
+            if (msg != null && msg.contains("abandon initialization") && msg.contains("installProviders")) {
+                return true;
+            }
+            if (msg != null && msg.contains("AutoSizeConfig#init() can only be called once")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasProtectionAssets(Context context) {
+        try {
+            String[] names = context.getAssets().list(CACHE_DIR);
+            if (names == null) return false;
+            boolean hasCode = false;
+            boolean hasDexes = false;
+            for (String n : names) {
+                if (CODE_BIN.equals(n)) hasCode = true;
+                if (DEXES_ZIP.equals(n)) hasDexes = true;
+            }
+            return hasCode && hasDexes;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    static File ensureDexesOnDisk(Context context) throws Exception {
+        ApplicationInfo info = context.getApplicationInfo();
+        File outDir = new File(context.getCodeCacheDir(), CACHE_DIR);
+        if (!outDir.exists() && !outDir.mkdirs()) {
+            throw new IllegalStateException("cannot create " + outDir);
+        }
+        invalidateIfApkChanged(outDir, new File(info.sourceDir));
+
+        File outZip = new File(outDir, DEXES_ZIP);
+        boolean warm = DexMerger.hasWarmCache(outDir);
+        if (!warm && !(outZip.exists() && outZip.length() > 0)) {
+            try (ZipFile apk = new ZipFile(info.sourceDir)) {
+                ZipEntry entry = apk.getEntry("assets/" + DEXES_ASSET);
+                if (entry != null) {
+                    try (InputStream in = apk.getInputStream(entry);
+                         FileOutputStream out = new FileOutputStream(outZip)) {
+                        copy(in, out);
+                    }
+                } else {
+                    try (InputStream in = context.getAssets().open(DEXES_ASSET);
+                         FileOutputStream out = new FileOutputStream(outZip)) {
+                        copy(in, out);
+                    }
+                }
+            }
+        }
+        copyAsset(context, CODE_ASSET, new File(outDir, CODE_BIN));
+        copyAsset(context, CONFIG_ASSET, new File(outDir, CONFIG_JSON));
+        // Optional — only present when packer used --protect-so
+        copyAsset(context, SOKEYS_ASSET, new File(outDir, SOKEYS_BIN));
+        // Optional — Phase 3 NetGuard config
+        copyAsset(context, NETGUARD_ASSET, new File(outDir, NETGUARD_JSON));
+        writeStamp(outDir, new File(info.sourceDir));
+        return outDir;
+    }
+
+    /** Clear cached protector assets when APK mtime/length changes. */
+    static void invalidateIfApkChanged(File outDir, File apk) {
+        if (apk == null || !apk.isFile()) return;
+        String expected = apkStamp(apk);
+        File stampFile = new File(outDir, STAMP_FILE);
+        String actual = null;
+        if (stampFile.isFile()) {
+            try (FileInputStream in = new FileInputStream(stampFile)) {
+                byte[] buf = new byte[128];
+                int n = in.read(buf);
+                if (n > 0) {
+                    actual = new String(buf, 0, n, StandardCharsets.UTF_8).trim();
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        if (expected.equals(actual)) return;
+        deleteQuietly(new File(outDir, DEXES_ZIP));
+        deleteQuietly(new File(outDir, CODE_BIN));
+        deleteQuietly(new File(outDir, CONFIG_JSON));
+        deleteQuietly(new File(outDir, SOKEYS_BIN));
+        deleteQuietly(new File(outDir, NETGUARD_JSON));
+        // Extracted hollow dexes must not survive APK updates — DexMerger skips
+        // rewrite when classes*.dex already exists with non-zero length.
+        deleteExtractedDexes(outDir);
+        deleteQuietly(new File(outDir, ".prepatched"));
+        deleteQuietly(new File(outDir, "dex_bundle.zip")); // legacy from brief experiment
+        deleteDir(new File(outDir, "so_plain"));
+        deleteDir(new File(outDir, "so_cipher"));
+        deleteQuietly(stampFile);
+        Log.i(TAG, "protector cache invalidated for new APK");
+    }
+
+    /** Remove leftover classes*.dex under the protector code-cache dir. */
+    static void deleteExtractedDexes(File outDir) {
+        if (outDir == null || !outDir.isDirectory()) return;
+        File[] files = outDir.listFiles();
+        if (files == null) return;
+        for (File f : files) {
+            if (f == null || !f.isFile()) continue;
+            String n = f.getName();
+            if (n.startsWith("classes") && n.endsWith(".dex")) {
+                deleteQuietly(f);
+            }
+        }
+    }
+
+    private static void deleteDir(File dir) {
+        if (dir == null || !dir.exists()) return;
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f == null) continue;
+                if (f.isDirectory()) deleteDir(f);
+                else deleteQuietly(f);
+            }
+        }
+        deleteQuietly(dir);
+    }
+
+    static void writeStamp(File outDir, File apk) {
+        if (apk == null || !apk.isFile()) return;
+        try (FileOutputStream out = new FileOutputStream(new File(outDir, STAMP_FILE))) {
+            out.write(apkStamp(apk).getBytes(StandardCharsets.UTF_8));
+        } catch (Exception ignored) {
+        }
+    }
+
+    static String apkStamp(File apk) {
+        return apk.lastModified() + ":" + apk.length();
+    }
+
+    private static void deleteQuietly(File f) {
+        if (f != null && f.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            f.delete();
+        }
+    }
+
+    private static void copyAsset(Context context, String asset, File dest) {
+        if (dest.exists() && dest.length() > 0) return;
+        try (InputStream in = context.getAssets().open(asset);
+             FileOutputStream out = new FileOutputStream(dest)) {
+            copy(in, out);
+        } catch (Exception e) {
+            // sokeys.bin is optional unless packer set protect_so (native fail-closes).
+            Log.w(TAG, "copyAsset failed: " + asset + " → " + dest.getName()
+                    + " (" + e.getClass().getSimpleName() + ")");
+        }
+    }
+
+    private static void copy(InputStream in, FileOutputStream out) throws Exception {
+        byte[] buf = new byte[256 * 1024];
+        int n;
+        while ((n = in.read(buf)) > 0) {
+            out.write(buf, 0, n);
+        }
+        out.flush();
+    }
+
+    private static String safe(String s) {
+        return s == null ? "" : s.trim();
+    }
+}

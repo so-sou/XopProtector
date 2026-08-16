@@ -1,0 +1,33 @@
+# Sensitive strings for Phase 4 re-encode (scripts/obsc_encode.py --batch)
+# Native OBSC_DECODE / Java StrEnc
+
+frida
+linjector
+gum-js
+frida-agent
+gum-js-loop
+pool-frida
+xposed
+XposedBridge
+lsposed
+LSPosed
+edxposed
+EdXposed
+/system/bin/su
+/sbin/magisk
+/data/adb/magisk
+/data/adb/modules
+/dev/socket/qemud
+/dev/qemu_pipe
+protector.ProxyApp
+protector/dexes.zip
+protector/code.bin
+protector/config.json
+protector/sokeys.bin
+protector
+code.bin
+dexes.zip
+config.json
+sokeys.bin
+protector/netguard.json
+netguard.json

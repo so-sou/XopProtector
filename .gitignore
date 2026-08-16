@@ -1,0 +1,86 @@
+*.iml
+.gradle/
+.gradle-tmp-home/
+**/build/
+.idea/
+*.iws
+*.ipr
+local.properties
+.tmp-android-sdk/
+.cxx/
+captures/
+.DS_Store
+Thumbs.db
+*~
+
+# Build / release artifacts
+protector-demo/
+protector-native/
+executable/
+out/
+%OUT%/
+dist/
+*.log
+*.tmp
+*.swp
+
+# Android / DEX / packages (never commit customer or demo outputs)
+*.apk
+*.ap_
+*.aab
+*.dex
+*.odex
+*.vdex
+
+# Built jars (keep Gradle Wrapper + packer Android tool jars)
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+!packer/libs/*.jar
+
+# Signing / secrets
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+*.mobileprovision
+**/secrets/
+**/credentials/
+.env
+.env.*
+!.env.example
+
+# Desktop (.NET)
+desktop/**/bin/
+desktop/**/obj/
+desktop/**/publish/
+desktop/**/*.user
+desktop/**/*.suo
+
+# Native / IDE clutter
+**/.vs/
+**/cmake-build-*/
+**/CMakeUserPresets.json
+
+# Agent / local tool config
+.claude/
+
+# Local analysis leftovers
+/orig_list.txt
+/prot_list.txt
+*_list.txt
+
+# OS / editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.code-workspace
+
+# Crash / customer dumps (keep out of public clones)
+**/crash-logcat*.txt
+**/*-crash-*.txt
+**/*-sofix-verify.txt
+*.idsig
+*-size_report.json

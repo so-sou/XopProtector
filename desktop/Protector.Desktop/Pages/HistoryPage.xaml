@@ -1,0 +1,83 @@
+<UserControl x:Class="Protector.Desktop.Pages.HistoryPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:res="clr-namespace:Protector.Desktop.Resources"
+             Background="{DynamicResource BgApp}">
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Padding="20,14" Background="{DynamicResource BgPanel}"
+            BorderBrush="{DynamicResource BorderSoft}" BorderThickness="0,0,0,1">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{x:Static res:Strings.History_Title}" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}"/>
+            <TextBlock x:Name="CountText" Text="0" FontSize="11" Foreground="{DynamicResource TextDim}"
+                       Margin="10,0,0,0" VerticalAlignment="Center" FontFamily="Consolas"/>
+          </StackPanel>
+          <TextBlock Text="{x:Static res:Strings.History_Sub}"
+                     FontSize="11" Foreground="{DynamicResource TextMuted}" Margin="0,6,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+          <Button x:Name="FilterAllBtn" Content="{x:Static res:Strings.History_FilterAll}" Margin="0,0,6,0" Padding="10,5" FontSize="11"
+                  Click="Filter_Click" Tag="all" Cursor="Hand"/>
+          <Button x:Name="FilterDoneBtn" Content="{x:Static res:Strings.History_FilterDone}" Margin="0,0,6,0" Padding="10,5" FontSize="11"
+                  Click="Filter_Click" Tag="done" Cursor="Hand"/>
+          <Button x:Name="FilterFailedBtn" Content="{x:Static res:Strings.History_FilterFailed}" Margin="0,0,6,0" Padding="10,5" FontSize="11"
+                  Click="Filter_Click" Tag="failed" Cursor="Hand"/>
+          <Button Content="{x:Static res:Strings.History_Clear}" Style="{StaticResource GhostButton}" Padding="10,5" FontSize="11"
+                  Click="Clear_Click"/>
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Grid>
+      <StackPanel x:Name="EmptyState" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <TextBlock Text="{x:Static res:Strings.History_Empty}" FontSize="13" Foreground="{DynamicResource TextDim}" HorizontalAlignment="Center"/>
+        <TextBlock Text="{x:Static res:Strings.History_EmptyHint}" FontSize="11" Foreground="{DynamicResource TextFaint}"
+                   HorizontalAlignment="Center" Margin="0,6,0,0"/>
+      </StackPanel>
+
+      <ScrollViewer x:Name="ListScroll" Style="{StaticResource ThinScrollViewer}" VerticalScrollBarVisibility="Auto" Visibility="Collapsed" Padding="16,12">
+        <ItemsControl x:Name="HistoryList">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Border Margin="0,0,0,8" Padding="14,12" CornerRadius="8" Cursor="Hand"
+                      Background="{DynamicResource BgPanel}" BorderBrush="{DynamicResource BorderSoft}" BorderThickness="1"
+                      MouseLeftButtonUp="Item_Click" Tag="{Binding}">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                  </Grid.ColumnDefinitions>
+                  <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                      <TextBlock Text="{Binding InputName}" FontSize="13" FontWeight="SemiBold"
+                                 Foreground="{DynamicResource TextPrimary}" TextTrimming="CharacterEllipsis" MaxWidth="420"/>
+                      <Border Margin="10,0,0,0" CornerRadius="4" Padding="6,1" VerticalAlignment="Center"
+                              Background="{Binding StatusBg}" BorderBrush="{Binding StatusBorder}" BorderThickness="1">
+                        <TextBlock Text="{Binding StatusLabel}" FontSize="10" Foreground="{Binding StatusFg}"/>
+                      </Border>
+                    </StackPanel>
+                    <TextBlock FontSize="11" Foreground="{DynamicResource TextDim}" Margin="0,4,0,0" FontFamily="Consolas"
+                               Text="{Binding MetaLine}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="0,3,0,0" FontFamily="Consolas"
+                               Text="{Binding PathLine}" TextTrimming="CharacterEllipsis"/>
+                  </StackPanel>
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="16,0,0,0">
+                    <TextBlock Text="{Binding TimeLabel}" FontSize="11" Foreground="{DynamicResource TextMuted}"
+                               HorizontalAlignment="Right"/>
+                    <TextBlock Text="{Binding DurationLabel}" FontSize="10" Foreground="{DynamicResource TextFaint}"
+                               FontFamily="Consolas" HorizontalAlignment="Right" Margin="0,4,0,0"/>
+                  </StackPanel>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Grid>
+  </DockPanel>
+</UserControl>
