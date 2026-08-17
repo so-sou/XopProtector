@@ -14,6 +14,29 @@ on-device native shell (`libprotector.so`) with DEX encryption, dual VMP, SO pro
 
 ## Quick start
 
+### Try the Windows desktop build first (recommended)
+
+If you only want to use the tool, download the latest Windows package from
+**[Releases](https://github.com/xopJack/XopProtector/releases)**
+(e.g. `XopProtector-*-win-x64.zip` or the Setup installer):
+
+1. Download, extract, then run `XopProtector.exe`
+
+The desktop build ships with the packer engine; no Android SDK / NDK / .NET setup is required.
+
+Build from source only if you need to modify the code or contribute — see below.
+
+### 0) Configure Android SDK (required)
+
+Edit `local.properties` at the repo root and set `sdk.dir` to **your** Android SDK path before building:
+
+```properties
+# Windows example (escape backslashes)
+sdk.dir=D\:\\Android\\Sdk
+```
+
+You may skip editing the file and use `ANDROID_HOME` / `ANDROID_SDK_ROOT` instead.
+
 ### Prerequisites
 
 | Tool | Purpose |
@@ -22,7 +45,7 @@ on-device native shell (`libprotector.so`) with DEX encryption, dual VMP, SO pro
 | Android SDK + NDK | `:native`, `:demo`, `exportShellFiles` |
 | .NET SDK 7+ (optional) | Windows desktop UI |
 
-Set `ANDROID_HOME` or `ANDROID_SDK_ROOT`. On Windows, prefer `gradlew.bat`.
+Set `ANDROID_HOME` or `ANDROID_SDK_ROOT` (or edit `local.properties` as above). On Windows, prefer `gradlew.bat`.
 
 ### 1) Build packer + shell
 

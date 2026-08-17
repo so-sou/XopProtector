@@ -51,6 +51,7 @@ public partial class HardenPage : UserControl
     private DispatcherTimer? _aliasProbeTimer;
     private int _aliasProbeGen;
     private bool _restoringSign;
+    private bool _installBusy;
     private DispatcherTimer? _signSaveTimer;
     private readonly ConcurrentQueue<string> _pendingLogLines = new();
     private DispatcherTimer? _logFlushTimer;
@@ -463,10 +464,7 @@ public partial class HardenPage : UserControl
                 : Strings.Harden_SoBudgetHintDefault;
 
             if (!_userOverrideSoBudget)
-            {
-                SoBudgetBox.Text = "";
-                SoMaxFileBox.Text = "";
-            }
+                SoBudgetPresetBox.SelectedIndex = 0;
         }
         finally
         {
@@ -486,10 +484,10 @@ public partial class HardenPage : UserControl
         _userOverrideIndustryAutoVmp = true;
     }
 
-    private void SoBudget_TextChanged(object sender, TextChangedEventArgs e)
+    private void SoBudgetPreset_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (_applyingAdvancedPreset) return;
-        if (!string.IsNullOrWhiteSpace(SoBudgetBox.Text) || !string.IsNullOrWhiteSpace(SoMaxFileBox.Text))
+        if (_applyingAdvancedPreset || !IsLoaded) return;
+        if (SoBudgetPresetBox.SelectedIndex > 0)
             _userOverrideSoBudget = true;
     }
 
@@ -520,15 +518,23 @@ public partial class HardenPage : UserControl
             PinCertsBox.Text = dlg.FileName;
     }
 
-    private static double? TryParsePositiveMb(string? text)
+    /// <summary>Tag format: default | budget:maxFile (e.g. 12:8).</summary>
+    private (double? BudgetMb, double? MaxFileMb) ResolveSoBudgetPreset()
     {
-        if (string.IsNullOrWhiteSpace(text)) return null;
-        if (!double.TryParse(text.Trim(), System.Globalization.NumberStyles.Float,
-                System.Globalization.CultureInfo.InvariantCulture, out var v)
-            && !double.TryParse(text.Trim(), System.Globalization.NumberStyles.Float,
-                System.Globalization.CultureInfo.CurrentCulture, out v))
-            return null;
-        return v > 0 ? v : null;
+        var tag = ComboTag(SoBudgetPresetBox, "default");
+        if (string.IsNullOrWhiteSpace(tag)
+            || string.Equals(tag, "default", StringComparison.OrdinalIgnoreCase))
+            return (null, null);
+
+        var parts = tag.Split(':', 2);
+        if (parts.Length != 2) return (null, null);
+        if (!double.TryParse(parts[0], System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var budget)
+            || !double.TryParse(parts[1], System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var maxFile))
+            return (null, null);
+        if (budget <= 0 || maxFile <= 0) return (null, null);
+        return (budget, maxFile);
     }
 
     private void SignMode_Click(object sender, MouseButtonEventArgs e)
@@ -652,6 +658,7 @@ public partial class HardenPage : UserControl
         UpdateChrome();
         AppendLog(Strings.Harden_LogStart + IOPath.GetFileName(_inputApk));
 
+        var soBudget = ResolveSoBudgetPreset();
         var job = new ProtectJobRequest
         {
             InputApk = _inputApk,
@@ -661,11 +668,11 @@ public partial class HardenPage : UserControl
             ProtectSoMode = ComboTag(SoModeBox, "safe"),
             PaymentAutoVmp = PaymentAutoVmpBox.IsChecked == true,
             IndustryAutoVmp = IndustryAutoVmpBox.IsChecked == true,
-            ProtectSoBudgetMb = TryParsePositiveMb(SoBudgetBox.Text),
-            ProtectSoMaxFileMb = TryParsePositiveMb(SoMaxFileBox.Text),
-            EncryptAssets = EncryptAssetsBox.IsChecked == true,
-            EnableResProtect = ResProtectBox.IsChecked == true,
-            DetectProxy = DetectProxyBox.IsChecked == true,
+            ProtectSoBudgetMb = soBudget.BudgetMb,
+            ProtectSoMaxFileMb = soBudget.MaxFileMb,
+            EncryptAssets = false,
+            EnableResProtect = false,
+            DetectProxy = false,
             PinCertsFile = string.IsNullOrWhiteSpace(PinCertsBox.Text) ? null : PinCertsBox.Text.Trim(),
             Channel = string.IsNullOrWhiteSpace(ChannelBox.Text) ? null : ChannelBox.Text.Trim(),
             HollowPrefixes = HollowPrefixBox.Text,
@@ -837,7 +844,9 @@ public partial class HardenPage : UserControl
         DoneOutput.Visibility = Visibility.Collapsed;
         InstallTestBtn.Visibility = Visibility.Collapsed;
         InstallTestBtn.IsEnabled = true;
+        InstallTestBtn.IsHitTestVisible = true;
         InstallTestBtn.Content = Strings.Harden_InstallTest;
+        _installBusy = false;
     }
 
     private async Task ShowDoneCardAsync(string outputApk)
@@ -870,6 +879,8 @@ public partial class HardenPage : UserControl
 
     private async void InstallTest_Click(object sender, RoutedEventArgs e)
     {
+        if (_installBusy) return;
+
         if (DeviceBox.SelectedItem is not AdbService.Device device)
         {
             MessageBox.Show(Strings.Harden_NoDeviceSelected, Strings.ProductName,
@@ -892,7 +903,10 @@ public partial class HardenPage : UserControl
             return;
         }
 
-        InstallTestBtn.IsEnabled = false;
+        _installBusy = true;
+        InstallTestBtn.Visibility = Visibility.Visible;
+        InstallTestBtn.IsEnabled = true;
+        InstallTestBtn.IsHitTestVisible = false;
         InstallTestBtn.Content = Strings.Harden_Installing;
         AppendLog($"[adb] install --no-incremental -r -t → {device.DisplayName}");
 
@@ -930,6 +944,9 @@ public partial class HardenPage : UserControl
         }
         finally
         {
+            _installBusy = false;
+            InstallTestBtn.Visibility = Visibility.Visible;
+            InstallTestBtn.IsHitTestVisible = true;
             InstallTestBtn.IsEnabled = true;
             InstallTestBtn.Content = Strings.Harden_InstallTest;
         }

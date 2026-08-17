@@ -69,10 +69,12 @@ public static class Strings
     public static string Harden_SoBudgetSection => G(nameof(Harden_SoBudgetSection));
     public static string Harden_SoBudgetHintDefault => G(nameof(Harden_SoBudgetHintDefault));
     public static string Harden_SoBudgetHintIndustry => G(nameof(Harden_SoBudgetHintIndustry));
-    public static string Harden_SoBudgetMb => G(nameof(Harden_SoBudgetMb));
-    public static string Harden_SoMaxFileMb => G(nameof(Harden_SoMaxFileMb));
     public static string Harden_SoBudgetTip => G(nameof(Harden_SoBudgetTip));
-    public static string Harden_SoMaxFileTip => G(nameof(Harden_SoMaxFileTip));
+    public static string SoBudget_Default => G(nameof(SoBudget_Default));
+    public static string SoBudget_8 => G(nameof(SoBudget_8));
+    public static string SoBudget_12 => G(nameof(SoBudget_12));
+    public static string SoBudget_24 => G(nameof(SoBudget_24));
+    public static string SoBudget_48 => G(nameof(SoBudget_48));
     public static string Harden_ResetAdvanced => G(nameof(Harden_ResetAdvanced));
     public static string Harden_ExtraProtectSection => G(nameof(Harden_ExtraProtectSection));
     public static string Harden_EncryptAssets => G(nameof(Harden_EncryptAssets));

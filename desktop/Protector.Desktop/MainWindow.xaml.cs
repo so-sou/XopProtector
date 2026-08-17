@@ -19,6 +19,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        ApplyInitialWindowSize();
         PageHost.Content = _harden;
         SidebarEngineVer.Text = ResolveAppVersion();
         Loaded += (_, _) =>
@@ -38,6 +39,36 @@ public partial class MainWindow : Window
                 _harden.ShowEngineError(ex.Message);
             }
         };
+    }
+
+    /// <summary>
+    /// Fit the design size (1180×760) into the current monitor work area.
+    /// Large screens keep the design size; small screens shrink (and may maximize).
+    /// </summary>
+    private void ApplyInitialWindowSize()
+    {
+        var wa = SystemParameters.WorkArea;
+        const double idealW = 1180;
+        const double idealH = 760;
+        const double edgeMargin = 40;
+
+        var maxW = Math.Max(0, wa.Width - edgeMargin);
+        var maxH = Math.Max(0, wa.Height - edgeMargin);
+
+        // Very small displays: use the full work area.
+        if (maxW < 800 || maxH < 500)
+        {
+            if (MinWidth > wa.Width) MinWidth = wa.Width;
+            if (MinHeight > wa.Height) MinHeight = wa.Height;
+            WindowState = WindowState.Maximized;
+            return;
+        }
+
+        if (MinWidth > maxW) MinWidth = maxW;
+        if (MinHeight > maxH) MinHeight = maxH;
+
+        Width = Math.Clamp(idealW, MinWidth, maxW);
+        Height = Math.Clamp(idealH, MinHeight, maxH);
     }
 
     private static string ResolveAppVersion()

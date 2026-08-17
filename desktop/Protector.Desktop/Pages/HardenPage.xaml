@@ -238,6 +238,7 @@
                     <TextBlock Text="{x:Static res:Strings.Harden_AdvancedSub}" FontSize="10"
                                Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap" Margin="0,0,0,10"/>
 
+                    <!-- 1) Auto True-VMP -->
                     <TextBlock Text="{x:Static res:Strings.Harden_AutoVmpSection}" FontSize="11" FontWeight="Medium"
                                Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
                     <CheckBox x:Name="PaymentAutoVmpBox" IsChecked="True" Margin="0,0,0,6"
@@ -253,8 +254,46 @@
                                  TextWrapping="Wrap"/>
                     </CheckBox>
                     <TextBlock Text="{x:Static res:Strings.Harden_AutoVmpSlowTip}" FontSize="10"
-                               Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+                               Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap" Margin="0,0,0,12"/>
 
+                    <!-- Extra protect (assets / res / NetGuard): hidden — not transparent for third-party APKs -->
+                    <StackPanel x:Name="ExtraProtectPanel" Visibility="Collapsed">
+                      <TextBlock Text="{x:Static res:Strings.Harden_ExtraProtectSection}" FontSize="11" FontWeight="Medium"
+                                 Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                      <CheckBox x:Name="EncryptAssetsBox" IsChecked="False" Margin="0,0,0,6"
+                                Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
+                                ToolTip="{x:Static res:Strings.Harden_EncryptAssetsTip}">
+                        <TextBlock Text="{x:Static res:Strings.Harden_EncryptAssets}" FontSize="12" TextWrapping="Wrap"/>
+                      </CheckBox>
+                      <CheckBox x:Name="ResProtectBox" IsChecked="False" Margin="0,0,0,6"
+                                Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
+                                ToolTip="{x:Static res:Strings.Harden_ResProtectTip}">
+                        <TextBlock Text="{x:Static res:Strings.Harden_ResProtect}" FontSize="12" TextWrapping="Wrap"/>
+                      </CheckBox>
+                      <CheckBox x:Name="DetectProxyBox" IsChecked="False" Margin="0,0,0,12"
+                                Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
+                                ToolTip="{x:Static res:Strings.Harden_DetectProxyTip}">
+                        <TextBlock Text="{x:Static res:Strings.Harden_DetectProxy}" FontSize="12" TextWrapping="Wrap"/>
+                      </CheckBox>
+                    </StackPanel>
+
+                    <!-- SO size budget (dropdown like SO mode) -->
+                    <TextBlock Text="{x:Static res:Strings.Harden_SoBudgetSection}" FontSize="11" FontWeight="Medium"
+                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
+                    <TextBlock x:Name="SoBudgetHint" FontSize="10" Foreground="{DynamicResource TextFaint}"
+                               Margin="0,0,0,6" TextWrapping="Wrap"/>
+                    <ComboBox x:Name="SoBudgetPresetBox" Style="{StaticResource DarkCombo}" Width="160"
+                              HorizontalAlignment="Left" SelectedIndex="0" Margin="0,0,0,12"
+                              Cursor="Hand" SelectionChanged="SoBudgetPreset_SelectionChanged"
+                              ToolTip="{x:Static res:Strings.Harden_SoBudgetTip}">
+                      <ComboBoxItem Tag="default" Content="{x:Static res:Strings.SoBudget_Default}"/>
+                      <ComboBoxItem Tag="8:4" Content="{x:Static res:Strings.SoBudget_8}"/>
+                      <ComboBoxItem Tag="12:8" Content="{x:Static res:Strings.SoBudget_12}"/>
+                      <ComboBoxItem Tag="24:12" Content="{x:Static res:Strings.SoBudget_24}"/>
+                      <ComboBoxItem Tag="48:24" Content="{x:Static res:Strings.SoBudget_48}"/>
+                    </ComboBox>
+
+                    <!-- 4) True-VMP prefix -->
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
                       <TextBlock Text="{x:Static res:Strings.Harden_TrueVmpPrefix}" FontSize="11" FontWeight="Medium"
                                  Foreground="{DynamicResource TextDim}"/>
@@ -266,53 +305,8 @@
                              AcceptsReturn="True" MinHeight="44" TextWrapping="Wrap"
                              VerticalScrollBarVisibility="Auto"/>
 
-                    <TextBlock Text="{x:Static res:Strings.Harden_SoBudgetSection}" FontSize="11" FontWeight="Medium"
-                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
-                    <TextBlock x:Name="SoBudgetHint" FontSize="10" Foreground="{DynamicResource TextFaint}"
-                               Margin="0,0,0,6" TextWrapping="Wrap"/>
-                    <Grid Margin="0,0,0,8">
-                      <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="8"/>
-                        <ColumnDefinition Width="*"/>
-                      </Grid.ColumnDefinitions>
-                      <StackPanel>
-                        <TextBlock Text="{x:Static res:Strings.Harden_SoBudgetMb}" FontSize="10"
-                                   Foreground="{DynamicResource TextDim}" Margin="0,0,0,4"/>
-                        <TextBox x:Name="SoBudgetBox" Style="{StaticResource DarkInput}"
-                                 ToolTip="{x:Static res:Strings.Harden_SoBudgetTip}"
-                                 TextChanged="SoBudget_TextChanged"/>
-                      </StackPanel>
-                      <StackPanel Grid.Column="2">
-                        <TextBlock Text="{x:Static res:Strings.Harden_SoMaxFileMb}" FontSize="10"
-                                   Foreground="{DynamicResource TextDim}" Margin="0,0,0,4"/>
-                        <TextBox x:Name="SoMaxFileBox" Style="{StaticResource DarkInput}"
-                                 ToolTip="{x:Static res:Strings.Harden_SoMaxFileTip}"
-                                 TextChanged="SoBudget_TextChanged"/>
-                      </StackPanel>
-                    </Grid>
-                    <Button Content="{x:Static res:Strings.Harden_ResetAdvanced}" Style="{StaticResource GhostButton}"
-                            HorizontalAlignment="Left" Padding="10,6" Click="ResetAdvanced_Click"
-                            Cursor="Hand" Margin="0,0,0,12"/>
-
-                    <TextBlock Text="{x:Static res:Strings.Harden_ExtraProtectSection}" FontSize="11" FontWeight="Medium"
-                               Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
-                    <CheckBox x:Name="EncryptAssetsBox" IsChecked="False" Margin="0,0,0,6"
-                              Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
-                              ToolTip="{x:Static res:Strings.Harden_EncryptAssetsTip}">
-                      <TextBlock Text="{x:Static res:Strings.Harden_EncryptAssets}" FontSize="12" TextWrapping="Wrap"/>
-                    </CheckBox>
-                    <CheckBox x:Name="ResProtectBox" IsChecked="False" Margin="0,0,0,6"
-                              Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
-                              ToolTip="{x:Static res:Strings.Harden_ResProtectTip}">
-                      <TextBlock Text="{x:Static res:Strings.Harden_ResProtect}" FontSize="12" TextWrapping="Wrap"/>
-                    </CheckBox>
-                    <CheckBox x:Name="DetectProxyBox" IsChecked="False" Margin="0,0,0,6"
-                              Foreground="{DynamicResource TextPrimary}" Cursor="Hand"
-                              ToolTip="{x:Static res:Strings.Harden_DetectProxyTip}">
-                      <TextBlock Text="{x:Static res:Strings.Harden_DetectProxy}" FontSize="12" TextWrapping="Wrap"/>
-                    </CheckBox>
-                    <TextBlock Text="{x:Static res:Strings.Harden_PinCerts}" FontSize="10"
+                    <!-- 5) Cert pin + channel -->
+                    <TextBlock Text="{x:Static res:Strings.Harden_PinCerts}" FontSize="11" FontWeight="Medium"
                                Foreground="{DynamicResource TextDim}" Margin="0,0,0,4"/>
                     <Grid Margin="0,0,0,12">
                       <Grid.ColumnDefinitions>
@@ -339,6 +333,7 @@
                     <TextBlock Text="{x:Static res:Strings.Harden_ChannelNeedSign}" FontSize="10"
                                Foreground="{DynamicResource TextFaint}" TextWrapping="Wrap" Margin="0,0,0,12"/>
 
+                    <!-- 6) Other prefixes -->
                     <TextBlock Text="{x:Static res:Strings.Harden_PrefixSection}" FontSize="11" FontWeight="Medium"
                                Foreground="{DynamicResource TextDim}" Margin="0,0,0,6"/>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
@@ -357,10 +352,15 @@
                       <TextBlock Text="ⓘ" FontSize="10" Foreground="{DynamicResource TextFaint}" Margin="6,0,0,0"
                                  VerticalAlignment="Center" ToolTip="{x:Static res:Strings.Harden_Vmp1PrefixTip}"/>
                     </StackPanel>
-                    <TextBox x:Name="Vmp1PrefixBox" Style="{StaticResource DarkInput}" Margin="0,0,0,0"
+                    <TextBox x:Name="Vmp1PrefixBox" Style="{StaticResource DarkInput}" Margin="0,0,0,12"
                              ToolTip="{x:Static res:Strings.Harden_TrueVmpExample}"
                              AcceptsReturn="True" MinHeight="36" TextWrapping="Wrap"
                              VerticalScrollBarVisibility="Auto"/>
+
+                    <!-- 7) Reset at bottom -->
+                    <Button Content="{x:Static res:Strings.Harden_ResetAdvanced}" Style="{StaticResource GhostButton}"
+                            HorizontalAlignment="Left" Padding="10,6" Click="ResetAdvanced_Click"
+                            Cursor="Hand"/>
                   </StackPanel>
                 </Expander>
               </StackPanel>

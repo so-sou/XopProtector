@@ -48,18 +48,20 @@
   <data name="Harden_SoModeTitle" xml:space="preserve"><value>SO mode</value></data>
   <data name="Harden_SoModeSub" xml:space="preserve"><value>Security vs compatibility (recommended)</value></data>
   <data name="Harden_AdvancedTitle" xml:space="preserve"><value>Advanced options</value></data>
-  <data name="Harden_AdvancedSub" xml:space="preserve"><value>Auto True-VMP, prefixes, SO budget, assets/res/channel/NetGuard</value></data>
+  <data name="Harden_AdvancedSub" xml:space="preserve"><value>Auto True-VMP, prefixes, SO budget, channel</value></data>
   <data name="Harden_AutoVmpSection" xml:space="preserve"><value>Auto True-VMP</value></data>
   <data name="Harden_PaymentAutoVmp" xml:space="preserve"><value>Payment SDK callbacks (PaymentVmpRules)</value></data>
   <data name="Harden_IndustryAutoVmp" xml:space="preserve"><value>Industry sensitive types (IndustryVmpRules)</value></data>
   <data name="Harden_AutoVmpSlowTip" xml:space="preserve"><value>Many hits (esp. industry auto) can make protection much slower.</value></data>
   <data name="Harden_SoBudgetSection" xml:space="preserve"><value>SO size budget</value></data>
-  <data name="Harden_SoBudgetHintDefault" xml:space="preserve"><value>Leave empty to use engine defaults (12 / 8 MB).</value></data>
-  <data name="Harden_SoBudgetHintIndustry" xml:space="preserve"><value>Leave empty to use industry defaults (48 / 24 MB).</value></data>
-  <data name="Harden_SoBudgetMb" xml:space="preserve"><value>Budget (MB)</value></data>
-  <data name="Harden_SoMaxFileMb" xml:space="preserve"><value>Max file (MB)</value></data>
-  <data name="Harden_SoBudgetTip" xml:space="preserve"><value>Optional. Overrides --protect-so-budget-mb</value></data>
-  <data name="Harden_SoMaxFileTip" xml:space="preserve"><value>Optional. Overrides --protect-so-max-file-mb</value></data>
+  <data name="Harden_SoBudgetHintDefault" xml:space="preserve"><value>Default = engine (12 / 8 MB). Presets set budget / max-file.</value></data>
+  <data name="Harden_SoBudgetHintIndustry" xml:space="preserve"><value>Default = industry engine (48 / 24 MB). Presets set budget / max-file.</value></data>
+  <data name="Harden_SoBudgetTip" xml:space="preserve"><value>Overrides --protect-so-budget-mb and --protect-so-max-file-mb</value></data>
+  <data name="SoBudget_Default" xml:space="preserve"><value>Default</value></data>
+  <data name="SoBudget_8" xml:space="preserve"><value>8 / 4 MB</value></data>
+  <data name="SoBudget_12" xml:space="preserve"><value>12 / 8 MB</value></data>
+  <data name="SoBudget_24" xml:space="preserve"><value>24 / 12 MB</value></data>
+  <data name="SoBudget_48" xml:space="preserve"><value>48 / 24 MB</value></data>
   <data name="Harden_ResetAdvanced" xml:space="preserve"><value>Reset advanced to profile defaults</value></data>
   <data name="Harden_ExtraProtectSection" xml:space="preserve"><value>Extra protect</value></data>
   <data name="Harden_EncryptAssets" xml:space="preserve"><value>Encrypt assets/**</value></data>
@@ -105,7 +107,7 @@
   <data name="Harden_PhaseReady" xml:space="preserve"><value>Ready</value></data>
   <data name="Harden_Success" xml:space="preserve"><value>Protection succeeded</value></data>
   <data name="Harden_InstallTest" xml:space="preserve"><value>Install &amp; launch</value></data>
-  <data name="Harden_Installing" xml:space="preserve"><value>Installing…</value></data>
+  <data name="Harden_Installing" xml:space="preserve"><value>Installing...</value></data>
   <data name="Harden_SelectDeviceTip" xml:space="preserve"><value>USB device for install test</value></data>
   <data name="Harden_InstallOk" xml:space="preserve"><value>Installed and launched on {0}</value></data>
   <data name="Harden_InstallOkNoLaunch" xml:space="preserve"><value>Installed on {0}, but launch failed:\n{1}</value></data>

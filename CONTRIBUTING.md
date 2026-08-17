@@ -11,6 +11,10 @@ Thanks for contributing to Protector. Please read this before opening a PR.
 | .NET SDK 7+ | Windows desktop (`desktop/Protector.Desktop`) |
 | Inno Setup 6 (optional) | Windows installer |
 
+Edit root `local.properties` (`sdk.dir`) for your machine, or export `ANDROID_HOME` / `ANDROID_SDK_ROOT`.
+
+Native shell depends on vendored `native/src/main/cpp/external/bhook` (bytehook). Keep that tree in the repo when cloning/pushing.
+
 ## Build
 
 From the repository root:

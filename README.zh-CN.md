@@ -13,6 +13,27 @@ Android APK 加固 monorepo：构建期打包引擎（JVM CLI + Windows 桌面�
 
 ## 快速开始
 
+### 先试用 Windows 桌面端（推荐）
+
+若不打算改源码，可直接从 GitHub **[Releases](https://github.com/xopJack/XopProtector/releases)** 下载最新的 Windows 包（如 `XopProtector-*-win-x64.zip` 或 Setup 安装包）：
+
+1. 下载，解压后运行 `XopProtector.exe`
+
+桌面端已自带加固引擎；无需自行配置 Android SDK / NDK / .NET。
+
+需要从源码编译、改功能或参与贡献时，再按下面步骤操作。
+
+### 0）配置 Android SDK（必做）
+
+打开仓库根目录的 `local.properties`，把 `sdk.dir` 改成**你本机** Android SDK 路径后再编译：
+
+```properties
+# Windows 示例（反斜杠需转义）
+sdk.dir=D\:\\Android\\Sdk
+```
+
+也可不改该文件，改用环境变量 `ANDROID_HOME` / `ANDROID_SDK_ROOT`。
+
 ### 环境要求
 
 | 工具 | 用途 |
@@ -21,7 +42,7 @@ Android APK 加固 monorepo：构建期打包引擎（JVM CLI + Windows 桌面�
 | Android SDK + NDK | `:native`、`:demo`、`exportShellFiles` |
 | .NET SDK 7+（可选） | Windows 桌面端 |
 
-请设置 `ANDROID_HOME` 或 `ANDROID_SDK_ROOT`。Windows 下推荐使用 `gradlew.bat`。
+请设置 `ANDROID_HOME` 或 `ANDROID_SDK_ROOT`（或按上面写好 `local.properties`）。Windows 下推荐使用 `gradlew.bat`。
 
 ### 1）编译 packer 与壳文件
 

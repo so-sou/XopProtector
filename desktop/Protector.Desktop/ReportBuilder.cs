@@ -86,8 +86,6 @@ public static class ReportBuilder
 
         if (job.ProtectSo) score += 8;
         else score -= 5;
-        if (job.EncryptAssets) score += 5;
-        if (job.EnableResProtect) score += 4;
         if (job.PaymentAutoVmp) score += 2;
         if (job.IndustryAutoVmp) score += 3;
         if (job.DetectProxy) score += 2;
@@ -129,12 +127,6 @@ public static class ReportBuilder
                         string.Format(Strings.Report_SoOnDetail, job.ProtectSoMode))
                     : new ReportCheck(Strings.Harden_SoTitle, "warn", Strings.Report_SoOffDetail),
                 new ReportCheck(Strings.Report_ShellInject, "pass", Strings.Report_ShellInjectDetail),
-                job.EncryptAssets
-                    ? new ReportCheck(Strings.Harden_EncryptAssets, "pass", Strings.Report_AssetsOnDetail)
-                    : new ReportCheck(Strings.Harden_EncryptAssets, "warn", Strings.Report_AssetsOffDetail),
-                job.EnableResProtect
-                    ? new ReportCheck(Strings.Harden_ResProtect, "pass", Strings.Report_ResOnDetail)
-                    : new ReportCheck(Strings.Harden_ResProtect, "warn", Strings.Report_ResOffDetail),
                 job.PaymentAutoVmp || job.IndustryAutoVmp
                     ? new ReportCheck(Strings.Report_AutoVmp, "pass",
                         string.Format(Strings.Report_AutoVmpDetail,

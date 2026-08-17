@@ -48,18 +48,20 @@
   <data name="Harden_SoModeTitle" xml:space="preserve"><value>SO 模式</value></data>
   <data name="Harden_SoModeSub" xml:space="preserve"><value>安全性与兼容性平衡（推荐）</value></data>
   <data name="Harden_AdvancedTitle" xml:space="preserve"><value>高级选项</value></data>
-  <data name="Harden_AdvancedSub" xml:space="preserve"><value>自动 True-VMP、前缀、SO 预算、assets/res/渠道/NetGuard</value></data>
+  <data name="Harden_AdvancedSub" xml:space="preserve"><value>自动 True-VMP、前缀、SO 预算、渠道</value></data>
   <data name="Harden_AutoVmpSection" xml:space="preserve"><value>自动 True-VMP</value></data>
   <data name="Harden_PaymentAutoVmp" xml:space="preserve"><value>支付 SDK 回调（PaymentVmpRules）</value></data>
   <data name="Harden_IndustryAutoVmp" xml:space="preserve"><value>行业敏感类（IndustryVmpRules）</value></data>
   <data name="Harden_AutoVmpSlowTip" xml:space="preserve"><value>命中较多（尤其行业自动）时加固会明显变慢。</value></data>
   <data name="Harden_SoBudgetSection" xml:space="preserve"><value>SO 体积预算</value></data>
-  <data name="Harden_SoBudgetHintDefault" xml:space="preserve"><value>留空则使用引擎默认（12 / 8 MB）。</value></data>
-  <data name="Harden_SoBudgetHintIndustry" xml:space="preserve"><value>留空则使用 industry 默认（48 / 24 MB）。</value></data>
-  <data name="Harden_SoBudgetMb" xml:space="preserve"><value>预算 (MB)</value></data>
-  <data name="Harden_SoMaxFileMb" xml:space="preserve"><value>单文件上限 (MB)</value></data>
-  <data name="Harden_SoBudgetTip" xml:space="preserve"><value>可选。覆盖 --protect-so-budget-mb</value></data>
-  <data name="Harden_SoMaxFileTip" xml:space="preserve"><value>可选。覆盖 --protect-so-max-file-mb</value></data>
+  <data name="Harden_SoBudgetHintDefault" xml:space="preserve"><value>默认 = 引擎（12 / 8 MB）。选项为 预算 / 单文件上限。</value></data>
+  <data name="Harden_SoBudgetHintIndustry" xml:space="preserve"><value>默认 = industry 引擎（48 / 24 MB）。选项为 预算 / 单文件上限。</value></data>
+  <data name="Harden_SoBudgetTip" xml:space="preserve"><value>覆盖 --protect-so-budget-mb 与 --protect-so-max-file-mb</value></data>
+  <data name="SoBudget_Default" xml:space="preserve"><value>默认</value></data>
+  <data name="SoBudget_8" xml:space="preserve"><value>8 / 4 MB</value></data>
+  <data name="SoBudget_12" xml:space="preserve"><value>12 / 8 MB</value></data>
+  <data name="SoBudget_24" xml:space="preserve"><value>24 / 12 MB</value></data>
+  <data name="SoBudget_48" xml:space="preserve"><value>48 / 24 MB</value></data>
   <data name="Harden_ResetAdvanced" xml:space="preserve"><value>重置高级为 Profile 默认</value></data>
   <data name="Harden_ExtraProtectSection" xml:space="preserve"><value>额外保护</value></data>
   <data name="Harden_EncryptAssets" xml:space="preserve"><value>加密 assets/**</value></data>
@@ -105,7 +107,7 @@
   <data name="Harden_PhaseReady" xml:space="preserve"><value>准备就绪</value></data>
   <data name="Harden_Success" xml:space="preserve"><value>加固成功</value></data>
   <data name="Harden_InstallTest" xml:space="preserve"><value>安装并启动</value></data>
-  <data name="Harden_Installing" xml:space="preserve"><value>安装中…</value></data>
+  <data name="Harden_Installing" xml:space="preserve"><value>正在安装...</value></data>
   <data name="Harden_SelectDeviceTip" xml:space="preserve"><value>选择要安装测试的 USB 设备</value></data>
   <data name="Harden_InstallOk" xml:space="preserve"><value>已安装并启动：{0}</value></data>
   <data name="Harden_InstallOkNoLaunch" xml:space="preserve"><value>已安装到 {0}，但启动失败：\n{1}</value></data>

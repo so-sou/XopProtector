@@ -1234,7 +1234,6 @@ public class PackerMain {
     private HollowResult hollowDex(File inputDex, File outputDex, byte[] aesKey, int dexIndex)
             throws Exception {
         // Use dx Dex API via classpath dx.jar for precise code offsets
-        com.android.dex.Dex dex = new com.android.dex.Dex(inputDex);
         byte[] data = Files.readAllBytes(inputDex.toPath());
         Files.write(outputDex.toPath(), data);
 
@@ -1244,69 +1243,151 @@ public class PackerMain {
         int autoPaymentMethods = 0;
         int autoIndustryTypes = 0;
         int autoIndustryMethods = 0;
-        try (RandomAccessFile raf = new RandomAccessFile(outputDex, "rw")) {
-            for (com.android.dex.ClassDef classDef : dex.classDefs()) {
-                if (classDef.getClassDataOffset() == 0) continue;
-                String type = dex.typeNames().get(classDef.getTypeIndex());
-                if (!shouldProcessType(type)) continue;
-                boolean autoPay = paymentAutoVmpEffective && PaymentVmpRules.matches(type);
-                boolean autoIndustry = !autoPay && industryAutoVmpEffective
-                        && IndustryVmpRules.matches(type, protectPolicy.appPackagePrefix());
-                if (autoPay) {
-                    autoPaymentTypes++;
-                }
-                if (autoIndustry) {
-                    autoIndustryTypes++;
-                }
+        Set<String> trueVmpMethodKeys = new HashSet<>();
 
-                com.android.dex.ClassData classData = dex.readClassData(classDef);
-                for (com.android.dex.ClassData.Method method : classData.getDirectMethods()) {
-                    InsnRecord rec = extractOne(dex, raf, method, aesKey, type);
-                    if (rec != null) {
-                        records.add(rec);
-                        if ((rec.flags & VmCodec.FLAG_TRUE_VMP) != 0) {
-                            trueVmpTargets.add(new TrueVmpTrampoline.Target(rec.methodIndex, dexIndex));
-                            if (autoPay) {
-                                autoPaymentMethods++;
-                            }
-                            if (autoIndustry) {
-                                autoIndustryMethods++;
-                            }
-                        }
-                    }
-                }
-                for (com.android.dex.ClassData.Method method : classData.getVirtualMethods()) {
-                    InsnRecord rec = extractOne(dex, raf, method, aesKey, type);
-                    if (rec != null) {
-                        records.add(rec);
-                        if ((rec.flags & VmCodec.FLAG_TRUE_VMP) != 0) {
-                            trueVmpTargets.add(new TrueVmpTrampoline.Target(rec.methodIndex, dexIndex));
-                            if (autoPay) {
-                                autoPaymentMethods++;
-                            }
-                            if (autoIndustry) {
-                                autoIndustryMethods++;
-                            }
-                        }
-                    }
-                }
-            }
+        // Phase 1: TRUE_VMP only. DexPool rebuilds the constant pool; any hollow
+        // payload captured before that rewrite has stale string/type/method indices
+        // and restores as VerifyError. So we trampoline first, then hollow.
+        // Dex(File) rejects non-.dex extensions (output is *.hollow) — load from bytes.
+        com.android.dex.Dex dex = new com.android.dex.Dex(Files.readAllBytes(outputDex.toPath()));
+        try (RandomAccessFile raf = new RandomAccessFile(outputDex, "rw")) {
+            int[] typeCounters = walkDexMethods(dex, raf, aesKey, ExtractPhase.TRUE_VMP_ONLY,
+                    records, trueVmpTargets, trueVmpMethodKeys, dexIndex, null);
+            autoPaymentTypes += typeCounters[0];
+            autoIndustryTypes += typeCounters[1];
+            autoPaymentMethods += typeCounters[2];
+            autoIndustryMethods += typeCounters[3];
         }
-        // Fix dex hashes after return-stub hollowing
         rewriteDexHashes(outputDex);
 
         if (!trueVmpTargets.isEmpty()) {
             TrueVmpTrampoline.rewrite(outputDex, trueVmpTargets);
             rewriteDexHashes(outputDex);
-            // DexPool re-interns method_ids. Rematch ALL hollowed methods
-            // (including TRUE_VMP) to the new indices, then patch trampoline
-            // const/16 immediates so code.bin keys stay unique and consistent.
             rematchMethodIndices(outputDex, records);
             TrueVmpTrampoline.rebindEmbeddedIndices(outputDex, records);
             rewriteDexHashes(outputDex);
+            System.out.println("TRUE_VMP DexPool done; hollowing against remapped pools");
         }
+
+        // Phase 2: hollow / PVM1 against the post-DexPool dex (correct indices).
+        dex = new com.android.dex.Dex(Files.readAllBytes(outputDex.toPath()));
+        try (RandomAccessFile raf = new RandomAccessFile(outputDex, "rw")) {
+            int[] typeCounters = walkDexMethods(dex, raf, aesKey, ExtractPhase.HOLLOW_OR_VMP,
+                    records, trueVmpTargets, trueVmpMethodKeys, dexIndex, trueVmpMethodKeys);
+            // Type counters already counted in phase 1 for overlapping types; only
+            // add methods newly hollowed that are payment/industry (rare).
+            autoPaymentMethods += typeCounters[2];
+            autoIndustryMethods += typeCounters[3];
+        }
+        rewriteDexHashes(outputDex);
+
         return new HollowResult(records, autoPaymentTypes, autoPaymentMethods,
                 autoIndustryTypes, autoIndustryMethods);
+    }
+
+    private enum ExtractPhase {
+        TRUE_VMP_ONLY,
+        HOLLOW_OR_VMP
+    }
+
+    /**
+     * @return int[]{autoPayTypes, autoIndustryTypes, autoPayMethods, autoIndustryMethods}
+     *         type counts are only filled on {@link ExtractPhase#TRUE_VMP_ONLY} (once).
+     */
+    private int[] walkDexMethods(com.android.dex.Dex dex, RandomAccessFile raf, byte[] aesKey,
+                                 ExtractPhase phase, List<InsnRecord> records,
+                                 List<TrueVmpTrampoline.Target> trueVmpTargets,
+                                 Set<String> trueVmpMethodKeys, int dexIndex,
+                                 Set<String> skipMethodKeys) throws Exception {
+        int autoPayTypes = 0;
+        int autoIndustryTypes = 0;
+        int autoPayMethods = 0;
+        int autoIndustryMethods = 0;
+        for (com.android.dex.ClassDef classDef : dex.classDefs()) {
+            if (classDef.getClassDataOffset() == 0) continue;
+            String type = dex.typeNames().get(classDef.getTypeIndex());
+            if (!shouldProcessType(type)) continue;
+            boolean autoPay = paymentAutoVmpEffective && PaymentVmpRules.matches(type);
+            boolean autoIndustry = !autoPay && industryAutoVmpEffective
+                    && IndustryVmpRules.matches(type, protectPolicy.appPackagePrefix());
+            if (phase == ExtractPhase.TRUE_VMP_ONLY) {
+                if (autoPay) {
+                    autoPayTypes++;
+                }
+                if (autoIndustry) {
+                    autoIndustryTypes++;
+                }
+            }
+
+            com.android.dex.ClassData classData = dex.readClassData(classDef);
+            for (com.android.dex.ClassData.Method method : classData.getDirectMethods()) {
+                InsnRecord rec = extractOne(dex, raf, method, aesKey, type, phase, skipMethodKeys);
+                if (rec == null) {
+                    continue;
+                }
+                records.add(rec);
+                if ((rec.flags & VmCodec.FLAG_TRUE_VMP) != 0) {
+                    trueVmpTargets.add(new TrueVmpTrampoline.Target(rec.methodIndex, dexIndex));
+                    trueVmpMethodKeys.add(methodKey(rec));
+                    if (autoPay) {
+                        autoPayMethods++;
+                    }
+                    if (autoIndustry) {
+                        autoIndustryMethods++;
+                    }
+                } else if (phase == ExtractPhase.HOLLOW_OR_VMP) {
+                    if (autoPay && shouldTrueVmp(type)) {
+                        // TRUE_VMP skip → hollow fallback still counts as payment protect.
+                        autoPayMethods++;
+                    }
+                    if (autoIndustry && shouldTrueVmp(type)) {
+                        autoIndustryMethods++;
+                    }
+                }
+            }
+            for (com.android.dex.ClassData.Method method : classData.getVirtualMethods()) {
+                InsnRecord rec = extractOne(dex, raf, method, aesKey, type, phase, skipMethodKeys);
+                if (rec == null) {
+                    continue;
+                }
+                records.add(rec);
+                if ((rec.flags & VmCodec.FLAG_TRUE_VMP) != 0) {
+                    trueVmpTargets.add(new TrueVmpTrampoline.Target(rec.methodIndex, dexIndex));
+                    trueVmpMethodKeys.add(methodKey(rec));
+                    if (autoPay) {
+                        autoPayMethods++;
+                    }
+                    if (autoIndustry) {
+                        autoIndustryMethods++;
+                    }
+                } else if (phase == ExtractPhase.HOLLOW_OR_VMP) {
+                    if (autoPay && shouldTrueVmp(type)) {
+                        autoPayMethods++;
+                    }
+                    if (autoIndustry && shouldTrueVmp(type)) {
+                        autoIndustryMethods++;
+                    }
+                }
+            }
+        }
+        return new int[]{autoPayTypes, autoIndustryTypes, autoPayMethods, autoIndustryMethods};
+    }
+
+    private static String methodKey(InsnRecord rec) {
+        return methodKey(rec.definingClass, rec.methodName, rec.paramTypes, rec.returnType);
+    }
+
+    private static String methodKey(String definingClass, String name, String[] params,
+                                    String returnType) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(definingClass).append('#').append(name).append('(');
+        if (params != null) {
+            for (String p : params) {
+                sb.append(p);
+            }
+        }
+        sb.append(')').append(returnType);
+        return sb.toString();
     }
 
     /**
@@ -1529,7 +1610,8 @@ public class PackerMain {
 
     private InsnRecord extractOne(com.android.dex.Dex dex, RandomAccessFile raf,
                                   com.android.dex.ClassData.Method method, byte[] aesKey,
-                                  String typeDescriptor) throws Exception {
+                                  String typeDescriptor, ExtractPhase phase,
+                                  Set<String> skipMethodKeys) throws Exception {
         if (method.getCodeOffset() == 0) return null;
         // Constructors/clinit must keep invokespecial/super; returning stubs fail ART verify.
         com.android.dex.MethodId methodId = dex.methodIds().get(method.getMethodIndex());
@@ -1537,9 +1619,6 @@ public class PackerMain {
         if ("<init>".equals(methodName) || "<clinit>".equals(methodName)) {
             return null;
         }
-        com.android.dex.Code code = dex.readCode(method);
-        short[] units = code.getInstructions();
-        if (units.length == 0) return null;
 
         String returnType = dex.typeNames().get(
                 dex.protoIds().get(dex.methodIds().get(method.getMethodIndex()).getProtoIndex())
@@ -1557,10 +1636,27 @@ public class PackerMain {
                 paramTypes[i] = dex.typeNames().get(types[i] & 0xffff);
             }
         }
+
+        String key = methodKey(typeDescriptor, methodName, paramTypes, returnType);
+        if (skipMethodKeys != null && skipMethodKeys.contains(key)) {
+            return null;
+        }
+
+        if (phase == ExtractPhase.TRUE_VMP_ONLY && !shouldTrueVmp(typeDescriptor)) {
+            return null;
+        }
+        if (phase == ExtractPhase.HOLLOW_OR_VMP
+                && !shouldHollow(typeDescriptor) && !shouldVmp(typeDescriptor)) {
+            return null;
+        }
+
+        com.android.dex.Code code = dex.readCode(method);
+        short[] units = code.getInstructions();
+        if (units.length == 0) return null;
+
         byte[] returnBytes = getReturnByteCodes(returnType);
         int byteSize = units.length * 2;
         if (byteSize < returnBytes.length) {
-            // Not enough room for a typed return stub
             return null;
         }
 
@@ -1569,59 +1665,47 @@ public class PackerMain {
         raf.seek(insnsOffset);
         raf.readFully(original);
 
-        // Write correct return stub at start, fill remaining with return-void
-        // (TRUE_VMP trampoline rewrite replaces the whole code item afterwards).
-        raf.seek(insnsOffset);
-        raf.write(returnBytes);
-        int filled = returnBytes.length;
-        while (filled + 2 <= byteSize) {
-            raf.writeShort(0x000e);
-            filled += 2;
-        }
-        if (filled < byteSize) {
-            raf.write(0);
-        }
-
         int flags = 0;
         byte[] toEncrypt = original;
         int plainSize = byteSize;
-
         boolean isStatic = (method.getAccessFlags() & 0x0008) != 0; // ACC_STATIC
-        if (shouldTrueVmp(typeDescriptor)) {
+
+        if (phase == ExtractPhase.TRUE_VMP_ONLY) {
             Pvm2Compiler.Result compiled =
                     Pvm2Compiler.tryCompile(dex, code, returnType, isStatic, pvm2Morph);
-            if (compiled.isOk()) {
-                toEncrypt = compiled.image;
-                plainSize = compiled.image.length;
-                flags = VmCodec.FLAG_TRUE_VMP;
-                Arrays.fill(original, (byte) 0);
-                trueVmpCompiled++;
-                System.out.println("TRUE_VMP " + typeDescriptor + "->" + methodName
-                        + (isStatic ? " [static]" : " [instance]")
-                        + " pvm2=" + plainSize + "B isa="
-                        + (pvm2Morph != null ? pvm2Morph.isaId : -1));
-            } else {
+            if (!compiled.isOk()) {
                 trueVmpSkipped++;
                 noteTrueVmpSkip(compiled.failReason);
                 System.out.println("TRUE_VMP skip " + typeDescriptor + "->" + methodName
                         + ": " + compiled.failReason);
-                // Encrypt-first default: do not fall back to hollow unless policy asks.
-                if (!shouldHollow(typeDescriptor) && !shouldVmp(typeDescriptor)) {
-                    raf.seek(insnsOffset);
-                    raf.write(original);
-                    return null;
-                }
+                return null;
             }
-        }
-
-        if (flags == 0 && shouldVmp(typeDescriptor)) {
-            byte[] pvm = VmCodec.encode(method.getMethodIndex(), original);
-            if (pvm == null) {
-                throw new IOException("VMP encode failed");
-            }
-            toEncrypt = pvm;
-            flags = VmCodec.FLAG_VMP;
+            // Stub until DexPool trampoline rewrite replaces the code item.
+            writeReturnStub(raf, insnsOffset, returnBytes, byteSize);
+            toEncrypt = compiled.image;
+            plainSize = compiled.image.length;
+            flags = VmCodec.FLAG_TRUE_VMP;
             Arrays.fill(original, (byte) 0);
+            trueVmpCompiled++;
+            System.out.println("TRUE_VMP " + typeDescriptor + "->" + methodName
+                    + (isStatic ? " [static]" : " [instance]")
+                    + " pvm2=" + plainSize + "B isa="
+                    + (pvm2Morph != null ? pvm2Morph.isaId : -1));
+        } else {
+            writeReturnStub(raf, insnsOffset, returnBytes, byteSize);
+            if (shouldVmp(typeDescriptor)) {
+                byte[] pvm = VmCodec.encode(method.getMethodIndex(), original);
+                if (pvm == null) {
+                    throw new IOException("VMP encode failed");
+                }
+                toEncrypt = pvm;
+                flags = VmCodec.FLAG_VMP;
+                Arrays.fill(original, (byte) 0);
+            } else if (!shouldHollow(typeDescriptor)) {
+                raf.seek(insnsOffset);
+                raf.write(original);
+                return null;
+            }
         }
 
         byte[] stored = CryptoUtils.aesGcmEncrypt(aesKey, toEncrypt);
@@ -1641,7 +1725,24 @@ public class PackerMain {
         rec.methodName = methodName;
         rec.paramTypes = paramTypes;
         rec.returnType = returnType;
+        rec.registersSize = code.getRegistersSize();
+        rec.insSize = code.getInsSize();
+        rec.outsSize = code.getOutsSize();
         return rec;
+    }
+
+    private static void writeReturnStub(RandomAccessFile raf, int insnsOffset,
+                                        byte[] returnBytes, int byteSize) throws IOException {
+        raf.seek(insnsOffset);
+        raf.write(returnBytes);
+        int filled = returnBytes.length;
+        while (filled + 2 <= byteSize) {
+            raf.writeShort(0x000e);
+            filled += 2;
+        }
+        if (filled < byteSize) {
+            raf.write(0);
+        }
     }
 
     /**
@@ -2304,5 +2405,9 @@ public class PackerMain {
         String methodName;
         String[] paramTypes;
         String returnType;
+        /** Original code_item header; required after DexPool outs_size recompute. */
+        int registersSize;
+        int insSize;
+        int outsSize = -1;
     }
 }

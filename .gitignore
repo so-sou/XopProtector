@@ -5,7 +5,6 @@
 .idea/
 *.iws
 *.ipr
-local.properties
 .tmp-android-sdk/
 .cxx/
 captures/
