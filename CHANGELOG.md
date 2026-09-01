@@ -1,6 +1,31 @@
 # Changelog
 
+## 0.6.27
+
+- Desktop / installer / packer jar version **0.6.27**.
+- Native shell ABIs: `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64` (x86 skips shadowhook).
+- Fix Android 10 (API 29): prefer ART `LoadClass` hook; skip broken Dobby `DefineClass`
+  replace on i386 (was SIGABRT in `GetIndexForClassDef`). Demo includes x86 ABIs for
+  emulator smoke.
+- Fix Android 6 (API 23) DEX load: `write_all` used `pubsetbuf` with a buffer that was
+  destroyed before `ofstream` flush (UAF). Last 256KiB of `classes.dex` became zeros
+  (`map_list` / `class_data`) → ART `Map is missing header entry`. Buffer now outlives
+  the stream; close/flush while it is still valid.
+- Fix Android 6 business SO: strip `DT_VERNEEDNUM` on `so_plain` (API≤24 only) so L3
+  dlopen is not rejected; `ensure_decrypted` still RC4s packaged ciphertext when the
+  linker mapped extract instead of `so_plain`.
+- Fix Android 7 (API 24) x86: do not pass an oat dir into `DexPathList.makePathElements`
+  for protector secondary dex (dex2oat caused ART `AllocObject` SIGSEGV). Skip Dobby
+  ART class hooks on x86 API≤24; defer `finishBusinessSoDecrypt` until first load.
+- Fix Android 10 arm64: `libc_export_hooked` / `verify_libc_text_crc` read libc
+  `.text` under execute-only memory (SEGV_ACCERR); use `process_vm_readv` instead.
+
 ## Unreleased
+
+- Temporarily disable assets encrypt / res-protect / NetGuard in desktop + `protectDemo`
+  (code kept; ExtraProtectPanel stays collapsed). Demo smoke no longer requires them.
+- Packer: probe SDK `zipalign` for `-P` before trying 16 KB page align, so older
+  build-tools (e.g. 34.0.0) no longer spam `ERROR: unknown flag` in desktop logs.
 
 ### Packer / Runtime — Class S system soname guard
 - Docs: Class S in `docs/so-load-contract.md` (system/OpenSSL/GLES collision).

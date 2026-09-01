@@ -11,8 +11,13 @@ class MainActivity : AppCompatActivity() {
         val tv = TextView(this)
         tv.textSize = 16f
         tv.setPadding(48, 48, 48, 48)
+        val packed = isProtectorPacked()
         try {
-            Business.stamp = 1
+            Business.stamp = 1 // triggers loadLibrary("demo_biz")
+            if (packed) {
+                // Linker may bypass hooked dlopen; force .text decrypt after load.
+                ProtectorShell.ensureBusinessSo("libdemo_biz.so")
+            }
             val secret = Business.secret()
             val sum = Business.add(40, 2)
             val score = Business.licenseScore(7, 11)
@@ -28,12 +33,9 @@ class MainActivity : AppCompatActivity() {
             val sync = Business.syncProbe(20)
             val lsh = Business.longShiftProbe(8L, 2)
             val fcast = Business.floatCastProbe(Float.NaN)
-            val asset = com.yqsh.protector.shell.ProtectorAssets.readString(this, "secret.txt").trim()
-            val netOk = com.yqsh.protector.shell.NetGuard.isInstalled()
-                    && com.yqsh.protector.shell.NetGuard.isDetectProxyEnabled()
-                    && com.yqsh.protector.shell.NetGuard.pinCount() >= 1
-                    && !com.yqsh.protector.shell.NetGuard.wasProxyDetected()
-            val channel = com.yqsh.protector.shell.ChannelReader.getChannel(this)
+
+            // Assets encrypt / NetGuard / channel probes are disabled for now
+            // (packer/desktop keep --encrypt-assets / --detect-proxy / --enable-res-protect off).
 
             var expectScore = (7 + 11) * 3
             if (expectScore < 0) expectScore *= -1
@@ -55,15 +57,14 @@ class MainActivity : AppCompatActivity() {
                     && sync == 82
                     && lsh == 34L
                     && fcast == 0
-                    && asset == "protector-asset-ok"
-                    && netOk
-                    && channel == "demo"
-            val status = if (ok) getString(R.string.status_pass) else getString(R.string.status_fail)
+            val status = when {
+                !packed -> getString(R.string.status_unpacked)
+                ok -> getString(R.string.status_pass)
+                else -> getString(R.string.status_fail)
+            }
             val msg = "secret=$secret add=$sum score=$score inv=$inv field=$field arr=$arr " +
                     "catch=$caught/$okPath so=$so f=$f d=$d fcmp=$fcmp sync=$sync lsh=$lsh fcast=$fcast " +
-                    "asset=$asset " +
-                    "net=installed/${com.yqsh.protector.shell.NetGuard.pinCount()}/proxy=${com.yqsh.protector.shell.NetGuard.wasProxyDetected()} " +
-                    "channel=$channel status=$status"
+                    "status=$status"
             tv.text = msg.replace(' ', '\n')
             Log.i("protector-demo", msg)
         } catch (t: Throwable) {

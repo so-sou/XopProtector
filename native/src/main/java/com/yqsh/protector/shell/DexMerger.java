@@ -1,5 +1,6 @@
 package com.yqsh.protector.shell;
 
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.Keep;
@@ -95,7 +96,12 @@ public final class DexMerger {
                 }
             }
             File oatDir = new File(protectorDir, "oat");
-            if (!oatDir.exists() && !oatDir.mkdirs()) {
+            // API≤24: dex2oat(speed) on protector secondary dex → ART AllocObject
+            // SIGSEGV after makeApplication on x86_64. Load without optimized dir.
+            if (Build.VERSION.SDK_INT <= 24) {
+                oatDir = null;
+                Log.i(TAG, "skip oat dir on API " + Build.VERSION.SDK_INT);
+            } else if (!oatDir.exists() && !oatDir.mkdirs()) {
                 Log.w(TAG, "cannot create oat dir: " + oatDir.getAbsolutePath());
                 oatDir = null;
             }
@@ -129,11 +135,23 @@ public final class DexMerger {
     }
 
     private static List<File> listExistingDexes(File outDir) {
-        File[] files = outDir.listFiles((d, n) -> n.startsWith("classes") && n.endsWith(".dex"));
+        // No lambdas/method-refs: shell runs before full multidex on API 23; R8
+        // ExternalSyntheticLambda* may be missing from the early ClassLoader path.
+        File[] files = outDir.listFiles(new java.io.FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.startsWith("classes") && name.endsWith(".dex");
+            }
+        });
         if (files == null || files.length == 0) {
             return new ArrayList<>();
         }
-        Arrays.sort(files, Comparator.comparing(File::getName));
+        Arrays.sort(files, new Comparator<File>() {
+            @Override
+            public int compare(File a, File b) {
+                return a.getName().compareTo(b.getName());
+            }
+        });
         List<File> result = new ArrayList<>();
         for (File f : files) {
             if (f.isFile() && f.length() > 0) {

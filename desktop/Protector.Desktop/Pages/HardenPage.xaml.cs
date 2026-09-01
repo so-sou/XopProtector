@@ -670,6 +670,7 @@ public partial class HardenPage : UserControl
             IndustryAutoVmp = IndustryAutoVmpBox.IsChecked == true,
             ProtectSoBudgetMb = soBudget.BudgetMb,
             ProtectSoMaxFileMb = soBudget.MaxFileMb,
+            // Temporarily forced off: assets encrypt / res-protect / NetGuard (UI panel collapsed).
             EncryptAssets = false,
             EnableResProtect = false,
             DetectProxy = false,

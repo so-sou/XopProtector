@@ -3,5 +3,6 @@
     <string name="app_name">protector-demo</string>
     <string name="status_pass">通过</string>
     <string name="status_fail">失败</string>
+    <string name="status_unpacked">未加密</string>
     <string name="status_error">错误：%1$s</string>
 </resources>

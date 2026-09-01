@@ -3,5 +3,6 @@
     <string name="app_name">protector-demo</string>
     <string name="status_pass">PASS</string>
     <string name="status_fail">FAIL</string>
+    <string name="status_unpacked">UNPACKED</string>
     <string name="status_error">ERROR: %1$s</string>
 </resources>

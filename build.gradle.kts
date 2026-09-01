@@ -147,9 +147,17 @@ tasks.register("exportShellFiles") {
             val dest = File(abiDir, "libshadowhook.so")
             if (dest.exists()) return@forEach
             val src = findShadowhookSo(abiDir.name)
-                ?: throw GradleException(
-                    "libshadowhook.so not found for ${abiDir.name}. Build :native first."
-                )
+            if (src == null) {
+                // bytehook only links shadowhook on arm/arm64; x86/x86_64 must still export.
+                val arm = abiDir.name == "armeabi-v7a" || abiDir.name == "arm64-v8a"
+                if (arm) {
+                    throw GradleException(
+                        "libshadowhook.so not found for ${abiDir.name}. Build :native first."
+                    )
+                }
+                println("Skip libshadowhook.so for ${abiDir.name} (not linked on this ABI)")
+                return@forEach
+            }
             Files.copy(src.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING)
             println("Exported ${abiDir.name}/libshadowhook.so (from ${src.absolutePath})")
         }
@@ -185,11 +193,9 @@ tasks.register("protectDemo") {
                 "--hollow-prefix", "Lcom/yqsh/protectordemo/Business;",
                 "--true-vmp-prefix", "Lcom/yqsh/protectordemo/Business;",
                 "--protect-so",
-                "--encrypt-assets",
-                "--enable-res-protect",
-                "--detect-proxy",
-                "--pin-certs", rootProject.file("demo/pins-demo.txt").absolutePath,
-                "--channel", "demo",
+                // Assets encrypt / res-protect / NetGuard temporarily off (code kept; demo no longer requires them).
+                "--no-encrypt-assets",
+                "--no-res-protect",
                 "--keystore", debugKs.absolutePath,
                 "--alias", "androiddebugkey",
                 "--storepass", "android",

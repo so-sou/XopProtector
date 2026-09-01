@@ -39,7 +39,7 @@ See [README.md](../README.md#quick-start) / [README.zh-CN.md](../README.zh-CN.md
 | Item | Support |
 |------|---------|
 | Host | Windows 10+ (desktop); JDK 17+ (packer) |
-| Device ABI | `armeabi-v7a`, `arm64-v8a` |
+| Device ABI | `armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64` |
 | minSdk | 24 |
 
 ### Security

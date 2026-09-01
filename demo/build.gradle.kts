@@ -9,13 +9,14 @@ android {
 
     defaultConfig {
         applicationId = "com.yqsh.protectordemo"
-        minSdk = 24
+        minSdk = 23
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
+            // Include x86/x86_64 for API 29 emulator smoke (Redmi Note9 is arm; keep both).
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
         externalNativeBuild {
             cmake {

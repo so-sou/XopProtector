@@ -10,9 +10,8 @@ import androidx.annotation.Keep
 object Business {
     init {
         System.loadLibrary("demo_biz")
-        // Linker may bypass hooked dlopen; force .text decrypt after load.
-        // Hard-fail if decrypt fails — running on ciphertext is SIGILL.
-        com.yqsh.protector.shell.JniBridge.ensureBusinessSo("libdemo_biz.so")
+        // Packed builds: MainActivity calls ProtectorShell.ensureBusinessSo after
+        // confirming assets/protector/config.json (unpacked must not load libprotector).
     }
 
     /** Static field for sget/sput coverage. */

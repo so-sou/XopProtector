@@ -31,6 +31,7 @@
 #include <vector>
 
 #if defined(__ANDROID__)
+#include <android/api-level.h>
 #include <android/dlext.h>
 #endif
 
@@ -284,7 +285,49 @@ PROTECTOR_ENCRYPT static bool decrypt_loaded_text(const std::string& so_name) {
     ClaimResult claim = claim_key(so_name, key_bytes);
     if (claim == ClaimResult::NotProtected) return true;
 
-    std::string path = find_so_path(so_name.c_str());
+    // Prefer packaged extract mapping when present: so_plain may also appear in
+    // maps while the JNI entry still points at ciphertext (API≤23 L2/L3 fallback).
+    std::string path;
+    bool mapped_plain = false;
+    {
+        FILE* fp = fopen("/proc/self/maps", "r");
+        if (fp != nullptr) {
+            char line[512];
+            std::string plain_hit;
+            std::string pkg_hit;
+            while (fgets(line, sizeof(line), fp) != nullptr) {
+                if (strstr(line, "r-xp") == nullptr && strstr(line, "rwxp") == nullptr) {
+                    continue;
+                }
+                char map_path[256] = {0};
+#ifdef __LP64__
+                if (sscanf(line, "%*llx-%*llx %*s %*llx %*s %*s %255s", map_path) != 1) continue;
+#else
+                if (sscanf(line, "%*x-%*x %*s %*x %*s %*s %255s", map_path) != 1) continue;
+#endif
+                const char* base = strrchr(map_path, '/');
+                base = base ? base + 1 : map_path;
+                if (strcmp(base, so_name.c_str()) != 0) continue;
+                if (strstr(map_path, "/so_plain/") != nullptr) {
+                    if (plain_hit.empty()) plain_hit = map_path;
+                } else if (pkg_hit.empty()) {
+                    pkg_hit = map_path;
+                }
+            }
+            fclose(fp);
+            if (!pkg_hit.empty()) {
+                path = std::move(pkg_hit);
+                mapped_plain = false;
+            } else if (!plain_hit.empty()) {
+                path = std::move(plain_hit);
+                mapped_plain = true;
+            }
+        }
+    }
+    if (path.empty()) {
+        path = find_so_path(so_name.c_str());
+        mapped_plain = path.find("/so_plain/") != std::string::npos;
+    }
     if (path.empty()) {
         if (claim == ClaimResult::Claimed) {
             memset(key_bytes, 0, sizeof(key_bytes));
@@ -294,7 +337,6 @@ PROTECTOR_ENCRYPT static bool decrypt_loaded_text(const std::string& so_name) {
         return false;
     }
 
-    const bool mapped_plain = path.find("/so_plain/") != std::string::npos;
     if (claim == ClaimResult::AlreadyDone) {
         // Disk mirror is plaintext; if THIS mapping is also so_plain, skip.
         // If linker still mapped packaged ciphertext, force in-memory RC4.
@@ -309,13 +351,39 @@ PROTECTOR_ENCRYPT static bool decrypt_loaded_text(const std::string& so_name) {
 
     bool ok = false;
     uintptr_t bias = 0;
-    if (!find_so_load_bias(so_name.c_str(), &bias)) {
-        PLOGW("business so load bias missing: %s", so_name.c_str());
-        memset(key_bytes, 0, sizeof(key_bytes));
-        if (claim == ClaimResult::Claimed) {
-            commit_key(so_name, false);
+    // Bias from the same path we will decrypt (packaged vs so_plain).
+    {
+        FILE* fp = fopen("/proc/self/maps", "r");
+        if (fp == nullptr) {
+            memset(key_bytes, 0, sizeof(key_bytes));
+            if (claim == ClaimResult::Claimed) commit_key(so_name, false);
+            return false;
         }
-        return false;
+        uintptr_t map_start = 0;
+        bool found_map = false;
+        char line[512];
+        while (fgets(line, sizeof(line), fp)) {
+            if (strstr(line, path.c_str()) == nullptr) continue;
+            unsigned long start = 0;
+            if (sscanf(line, "%lx-", &start) == 1) {
+                map_start = static_cast<uintptr_t>(start);
+                found_map = true;
+                break;
+            }
+        }
+        fclose(fp);
+        if (!found_map) {
+            PLOGW("business so load bias missing: %s path=%s", so_name.c_str(), path.c_str());
+            memset(key_bytes, 0, sizeof(key_bytes));
+            if (claim == ClaimResult::Claimed) commit_key(so_name, false);
+            return false;
+        }
+        uint64_t p_vaddr = 0;
+        if (!get_first_pt_load_vaddr(path.c_str(), &p_vaddr)) {
+            bias = map_start;
+        } else {
+            bias = map_start - static_cast<uintptr_t>(p_vaddr);
+        }
     }
 
     // Section headers from the same file that is mapped when possible.
@@ -359,6 +427,78 @@ PROTECTOR_ENCRYPT static bool decrypt_loaded_text(const std::string& so_name) {
 static void maybe_decrypt_by_name(const std::string& base) {
     if (base.empty()) return;
     (void)decrypt_loaded_text(base);
+}
+
+/**
+ * Android 6 (API≤23) linker rejects app-dir SOs that carry DT_VERNEED against
+ * libc ("cannot find libc.so from verneed[0]…"). Clear VERNEEDNUM on so_plain
+ * only — higher APIs keep symbol versions unchanged.
+ */
+static void strip_verneed_if_old_android(const std::string& path) {
+#if defined(__ANDROID__)
+    if (android_get_device_api_level() > 24) return;
+    FILE* fp = fopen(path.c_str(), "r+b");
+    if (fp == nullptr) return;
+    Elf_Ehdr ehdr{};
+    if (fread(&ehdr, 1, sizeof(ehdr), fp) != sizeof(ehdr)
+        || memcmp(ehdr.e_ident, ELFMAG, SELFMAG) != 0
+        || ehdr.e_phoff == 0
+        || ehdr.e_phentsize != sizeof(Elf_Phdr)
+        || ehdr.e_phnum == 0) {
+        fclose(fp);
+        return;
+    }
+    if (fseek(fp, static_cast<long>(ehdr.e_phoff), SEEK_SET) != 0) {
+        fclose(fp);
+        return;
+    }
+#ifdef __LP64__
+    using Dyn = Elf64_Dyn;
+#else
+    using Dyn = Elf32_Dyn;
+#endif
+    Elf_Off dyn_off = 0;
+    size_t dyn_bytes = 0;
+    for (uint16_t i = 0; i < ehdr.e_phnum; i++) {
+        Elf_Phdr ph{};
+        if (fread(&ph, 1, sizeof(ph), fp) != sizeof(ph)) break;
+        if (ph.p_type == PT_DYNAMIC) {
+            dyn_off = ph.p_offset;
+            dyn_bytes = static_cast<size_t>(ph.p_filesz);
+            break;
+        }
+    }
+    if (dyn_off == 0 || dyn_bytes < sizeof(Dyn)) {
+        fclose(fp);
+        return;
+    }
+    const size_t n = dyn_bytes / sizeof(Dyn);
+    std::vector<Dyn> dyns(n);
+    if (fseek(fp, static_cast<long>(dyn_off), SEEK_SET) != 0
+        || fread(dyns.data(), sizeof(Dyn), n, fp) != n) {
+        fclose(fp);
+        return;
+    }
+    bool changed = false;
+    for (size_t i = 0; i < n; i++) {
+        if (dyns[i].d_tag == DT_NULL) break;
+        // DT_VERNEEDNUM — zero count disables version-requirement walk.
+        if (dyns[i].d_tag == DT_VERNEEDNUM && dyns[i].d_un.d_val != 0) {
+            dyns[i].d_un.d_val = 0;
+            changed = true;
+        }
+    }
+    if (changed) {
+        if (fseek(fp, static_cast<long>(dyn_off), SEEK_SET) == 0
+            && fwrite(dyns.data(), sizeof(Dyn), n, fp) == n) {
+            fflush(fp);
+            PLOGI("business so: stripped DT_VERNEEDNUM for API≤24 %s", path.c_str());
+        }
+    }
+    fclose(fp);
+#else
+    (void)path;
+#endif
 }
 
 /**
@@ -414,6 +554,7 @@ PROTECTOR_ENCRYPT static bool rc4_text_on_disk_claimed(const std::string& path,
     fflush(fp);
     fclose(fp);
     memset(plain.data(), 0, plain.size());
+    strip_verneed_if_old_android(path);
     commit_key(base, true);
     PLOGI("pre-decrypted business SO .text on disk: %s", base.c_str());
     return true;
@@ -426,7 +567,11 @@ PROTECTOR_ENCRYPT static bool decrypt_text_on_disk(const std::string& path,
     uint8_t key_bytes[16];
     ClaimResult claim = claim_key(base, key_bytes);
     if (claim == ClaimResult::NotProtected) return true;
-    if (claim == ClaimResult::AlreadyDone) return true;
+    if (claim == ClaimResult::AlreadyDone) {
+        // Warm so_plain from an older build may still carry DT_VERNEED.
+        strip_verneed_if_old_android(path);
+        return true;
+    }
     return rc4_text_on_disk_claimed(path, base, key_bytes);
 }
 
@@ -1979,18 +2124,58 @@ void install_business_so_hooks() {
     // Eager scan deferred — see decrypt_already_loaded_async from init_app.
 }
 
+/**
+ * True when /proc/self/maps has an executable mapping of {@code base} whose
+ * path is <b>not</b> so_plain (typically packaged extract ciphertext).
+ * Android 6 often fails L2/L3 dlopen(so_plain) (verneed) and falls back to the
+ * encrypted extract while disk materialize already marked the key decrypted.
+ */
+static bool packaged_so_mapped(const std::string& base) {
+    if (base.empty()) return false;
+    FILE* fp = fopen("/proc/self/maps", "r");
+    if (fp == nullptr) return false;
+    char line[512];
+    bool hit = false;
+    while (fgets(line, sizeof(line), fp) != nullptr) {
+        // r-xp / rwxp — skip non-executable (file read caches).
+        if (strstr(line, "r-xp") == nullptr && strstr(line, "rwxp") == nullptr) {
+            continue;
+        }
+        if (strstr(line, "/so_plain/") != nullptr) continue;
+        const char* slash = strrchr(line, '/');
+        const char* name = slash != nullptr ? slash + 1 : line;
+        // maps line ends with "path\n" — compare basename prefix
+        size_t n = base.size();
+        if (strncmp(name, base.c_str(), n) == 0
+            && (name[n] == '\0' || name[n] == '\n' || name[n] == ' ')) {
+            hit = true;
+            break;
+        }
+    }
+    fclose(fp);
+    return hit;
+}
+
 bool ensure_decrypted(const char* so_basename) {
     if (so_basename == nullptr || so_basename[0] == '\0') return true;
     std::string base = basename_of(so_basename);
     if (base.empty()) base = so_basename;
 
     bool tracked = false;
+    bool disk_done = false;
     {
         std::lock_guard<std::mutex> lock(g_mu);
         SoKey* key = find_key_unlocked(base);
         if (key == nullptr) return true; // not protected
-        if (key->decrypted) return true;
+        disk_done = key->decrypted;
         tracked = true;
+    }
+
+    // Disk so_plain may already be plaintext (key.decrypted) while the linker
+    // still mapped packaged ciphertext — common on API≤23 when L2/L3 verneed
+    // fails. Only skip when no packaged executable mapping remains.
+    if (disk_done && !packaged_so_mapped(base)) {
+        return true;
     }
 
     // Lazy cold start skipped full materialize — ensure so_plain + keyed deps first.
