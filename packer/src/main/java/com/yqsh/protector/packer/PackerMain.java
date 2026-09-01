@@ -2213,15 +2213,18 @@ public class PackerMain {
     }
 
     private static boolean trySdkZipalign(File zipalign, File input, File output) {
-        // Prefer modern page-size flag; fall back to deprecated -p.
-        String[][] argSets = {
-                {zipalign.getAbsolutePath(), "-P", "16", "-f", "4",
-                        input.getAbsolutePath(), output.getAbsolutePath()},
-                {zipalign.getAbsolutePath(), "-f", "-p", "4",
-                        input.getAbsolutePath(), output.getAbsolutePath()},
-                {zipalign.getAbsolutePath(), "-f", "4",
-                        input.getAbsolutePath(), output.getAbsolutePath()},
-        };
+        // Prefer -P 16 when build-tools supports it (16 KB page). Older tools
+        // (e.g. 34.0.0) reject -P and print "ERROR: unknown flag" — probe first
+        // so desktop logs do not look like a failed protect.
+        List<String[]> argSets = new ArrayList<>();
+        if (sdkZipalignSupportsPageSizeFlag(zipalign)) {
+            argSets.add(new String[]{zipalign.getAbsolutePath(), "-P", "16", "-f", "4",
+                    input.getAbsolutePath(), output.getAbsolutePath()});
+        }
+        argSets.add(new String[]{zipalign.getAbsolutePath(), "-f", "-p", "4",
+                input.getAbsolutePath(), output.getAbsolutePath()});
+        argSets.add(new String[]{zipalign.getAbsolutePath(), "-f", "4",
+                input.getAbsolutePath(), output.getAbsolutePath()});
         for (String[] args : argSets) {
             try {
                 ProcessBuilder pb = new ProcessBuilder(args);
@@ -2244,6 +2247,21 @@ public class PackerMain {
             }
         }
         return false;
+    }
+
+    /** True if this zipalign binary documents the {@code -P} page-size option. */
+    private static boolean sdkZipalignSupportsPageSizeFlag(File zipalign) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(zipalign.getAbsolutePath());
+            pb.redirectErrorStream(true);
+            Process p = pb.start();
+            String help = new String(p.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            p.waitFor();
+            // Usage lines mention "-P" only on newer build-tools.
+            return help.contains("-P") || help.contains("--page-size");
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     private static File findSdkZipalign() {

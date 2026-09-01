@@ -24,8 +24,13 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/uio.h>
 #include <time.h>
 #include <unistd.h>
+
+#if defined(__ANDROID__)
+#include <android/api-level.h>
+#endif
 
 namespace protector::risk {
 
@@ -402,11 +407,33 @@ static bool frida_tmp_files() {
 
 /**
  * Inline-hook fingerprint: ARM64 B/BL at the start of critical libc exports.
+ * Android 10+ may map libc .text execute-only (XOM); a plain load faults with
+ * SEGV_ACCERR. Read via process_vm_readv which is allowed for XOM pages.
  */
+static bool safe_read_u32(const void* addr, uint32_t* out) {
+    if (addr == nullptr || out == nullptr) return false;
+#if defined(__ANDROID__)
+    struct iovec local{out, sizeof(uint32_t)};
+    struct iovec remote{const_cast<void*>(addr), sizeof(uint32_t)};
+    ssize_t n = process_vm_readv(getpid(), &local, 1, &remote, 1, 0);
+    if (n == static_cast<ssize_t>(sizeof(uint32_t))) {
+        return true;
+    }
+#endif
+    // Pre-XOM / non-Android fallback — may SIGSEGV on API≥29 aarch64 if used.
+#if defined(__aarch64__) && defined(__ANDROID__)
+    if (android_get_device_api_level() >= 29) {
+        return false;
+    }
+#endif
+    *out = *reinterpret_cast<const uint32_t*>(addr);
+    return true;
+}
+
 static bool libc_export_hooked(void* fn) {
     if (fn == nullptr) return false;
-    auto* p = reinterpret_cast<const uint32_t*>(fn);
-    uint32_t w = p[0];
+    uint32_t w = 0;
+    if (!safe_read_u32(fn, &w)) return false;
 #ifdef __aarch64__
     if ((w & 0xFC000000u) == 0x14000000u) return true; // B
     if ((w & 0xFC000000u) == 0x94000000u) return true; // BL
@@ -621,12 +648,26 @@ static void verify_libc_text_crc() {
     size_t offset = 0;
     const auto* mem_base =
             reinterpret_cast<const uint8_t*>(info.dli_fbase) + shdr.sh_addr;
+    // Android 10+ XOM: cannot load from .text; process_vm_readv into a scratch page.
+    constexpr size_t kChunk = 4096;
+    uint8_t scratch[kChunk];
     while (remaining > 0) {
-        size_t chunk = remaining > static_cast<size_t>(INT32_MAX)
-                       ? static_cast<size_t>(INT32_MAX)
-                       : remaining;
+        size_t chunk = remaining > kChunk ? kChunk : remaining;
         crc_file = crc32_update(crc_file, file_buf + offset, chunk);
+#if defined(__ANDROID__)
+        struct iovec local{scratch, chunk};
+        struct iovec remote{const_cast<uint8_t*>(mem_base + offset), chunk};
+        ssize_t n = process_vm_readv(getpid(), &local, 1, &remote, 1, 0);
+        if (n != static_cast<ssize_t>(chunk)) {
+            free(file_buf);
+            PLOGW("libc .text XOM read failed at off=%zu errno=%d — skip crc",
+                  offset, errno);
+            return;
+        }
+        crc_mem = crc32_update(crc_mem, scratch, chunk);
+#else
         crc_mem = crc32_update(crc_mem, mem_base + offset, chunk);
+#endif
         offset += chunk;
         remaining -= chunk;
     }

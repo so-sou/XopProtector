@@ -2,7 +2,6 @@ package com.yqsh.protectordemo
 
 import android.app.Application
 import android.util.Log
-import com.yqsh.protector.shell.JniBridge
 
 /**
  * Real application used before packing / restored after shell init.
@@ -14,8 +13,11 @@ class DemoApplication : Application() {
     }
 
     private fun safeNativeVersion(): String {
+        if (!isProtectorPacked()) {
+            return "unpacked"
+        }
         return try {
-            JniBridge.nativeVersion()
+            ProtectorShell.nativeVersion()
         } catch (t: Throwable) {
             "unavailable: ${t.message}"
         }

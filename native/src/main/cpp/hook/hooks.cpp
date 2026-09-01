@@ -30,7 +30,8 @@ namespace protector::hook {
 
 static void* (*g_origin_define_class_v22)(void*, void*, const char*, size_t, void*, const void*, const void*) = nullptr;
 static void* (*g_origin_define_class_v21)(void*, const char*, void*, const void*, const void*) = nullptr;
-static void (*g_origin_load_class_v23)(void*, const void*, const void*, const void*, const char*) = nullptr;
+// LoadClass(Thread*, DexFile&, ClassDef&, Handle<Class>) — last arg is Handle, not char*.
+static void (*g_origin_load_class_v23)(void*, const void*, const void*, const void*, void*) = nullptr;
 
 struct ArtLibInfo {
     uintptr_t load_bias = 0;
@@ -324,7 +325,7 @@ static void* DefineClassV21(void* thiz, const char* descriptor, void* class_load
 }
 
 static void LoadClassV23(void* thiz, const void* self, const void* dex_file,
-                         const void* dex_class_def, const char* klass) {
+                         const void* dex_class_def, void* klass) {
     if (g_origin_load_class_v23 == nullptr) {
         return;
     }
@@ -333,6 +334,16 @@ static void LoadClassV23(void* thiz, const void* self, const void* dex_file,
 }
 
 static bool hook_define_class() {
+    // Android 10 (API 29) x86: Dobby replace of DefineClass scrambles the
+    // ClassDef& such that ART aborts in GetIndexForClassDef
+    // (&class_def < class_defs_). Arm64/11+ keep DefineClass; API<=29 uses
+    // LoadClass first (see install_hooks).
+    if (runtime_state().sdk_level <= 29) {
+#if defined(__i386__) || defined(__x86_64__)
+        PLOGE("sdk=%d x86: skip DefineClass Dobby hook", runtime_state().sdk_level);
+        return false;
+#endif
+    }
     char sym[512] = {0};
     const char* path = art_lib_path();
     if (!find_symbol_contains(path, "ClassLinker", "DefineClass", sym, sizeof(sym))) {
@@ -360,15 +371,19 @@ static bool hook_load_class() {
     if (runtime_state().sdk_level < 23) return false;
     char sym[512] = {0};
     const char* path = art_lib_path();
-    if (!find_symbol_contains(path, "ClassLinker", "LoadClass", sym, sizeof(sym))) {
-        PLOGW("LoadClass symbol not found");
-        return false;
+    // Prefer exact LoadClass(Thread*, DexFile&, ClassDef&, Handle) — avoid matching
+    // LoadClassMembers / similar helpers that also contain "LoadClass".
+    if (!find_symbol_contains(path, "ClassLinker9LoadClass", "ClassDef", sym, sizeof(sym))) {
+        if (!find_symbol_contains(path, "ClassLinker", "LoadClassEPNS", sym, sizeof(sym))) {
+            PLOGW("LoadClass symbol not found");
+            return false;
+        }
     }
     void* addr = resolve_art_symbol(sym);
     if (!addr) return false;
     int rc = DobbyHook(addr, (dobby_dummy_func_t)LoadClassV23,
                        (dobby_dummy_func_t*)&g_origin_load_class_v23);
-    PLOGI("LoadClass hook rc=%d", rc);
+    PLOGI("LoadClass hook rc=%d sym=%s", rc, sym);
     return rc == 0;
 }
 
@@ -468,9 +483,26 @@ PROTECTOR_ENCRYPT void install_hooks() {
     ensure_bytehook();
     hook_execve();
     hook_mmap();
-    bool ok = hook_define_class();
-    if (!ok) {
+    // API 24 (Android 7) x86_64: Dobby LoadClass/DefineClass leads to ART
+    // AllocObject SIGSEGV right after makeApplication. Prefer no class hook —
+    // hollow restore relies on prepatch (API≥25) or stays on stubs / TRUE_VMP.
+    bool ok = false;
+#if defined(__x86_64__) || defined(__i386__)
+    if (runtime_state().sdk_level <= 24) {
+        PLOGE("sdk=%d x86: skip ART class hooks (Dobby unstable)", runtime_state().sdk_level);
+        ok = true; // do not treat as fatal — TRUE_VMP + optional prepatch still work
+    } else
+#endif
+    if (runtime_state().sdk_level <= 29) {
         ok = hook_load_class();
+        if (!ok) {
+            ok = hook_define_class();
+        }
+    } else {
+        ok = hook_define_class();
+        if (!ok) {
+            ok = hook_load_class();
+        }
     }
     if (!ok) {
         // Hollow restore depends on DefineClass/LoadClass hooks. Honour rasp_action

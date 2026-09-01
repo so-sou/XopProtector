@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -108,7 +109,9 @@ public class ProxyApplication extends Application {
         }
         File dir = ensureDexesOnDisk(context);
         // ACF already ran heavy init — only bind Context + signature/heartbeat.
-        if (ProxyComponentFactory.isBootstrapped()) {
+        // AppComponentFactory (API 28+). Do not touch ProxyComponentFactory on older
+        // APIs — loading it fails verification (superclass AppComponentFactory missing).
+        if (Build.VERSION.SDK_INT >= 28 && ProxyComponentFactory.isBootstrapped()) {
             NativeLibDirRedirect.apply(context, dir);
             JniBridge.verifySignature(context);
             startHeartbeat();
@@ -134,7 +137,12 @@ public class ProxyApplication extends Application {
         JniBridge.initApp(dir.getAbsolutePath());
         NativeLibDirRedirect.apply(context, dir);
         DexMerger.merge(context.getClassLoader(), dir);
-        JniBridge.finishBusinessSoDecrypt();
+        // API≤24 x86: defer SO preload — L2/L3 verneed is flaky; ensureBusinessSo decrypts later.
+        if (Build.VERSION.SDK_INT > 24) {
+            JniBridge.finishBusinessSoDecrypt();
+        } else {
+            Log.i(TAG, "skip finishBusinessSoDecrypt on API " + Build.VERSION.SDK_INT);
+        }
         JniBridge.enableJunkVerify();
         JniBridge.verifySignature(context);
         startHeartbeat();

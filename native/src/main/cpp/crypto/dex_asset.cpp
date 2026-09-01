@@ -34,13 +34,18 @@ static bool read_all(const std::string& path, std::vector<uint8_t>& out) {
 }
 
 static bool write_all(const std::string& path, const uint8_t* data, size_t len) {
+    // Buffer must outlive the ofstream: pubsetbuf does not copy; destroying the
+    // vector before ofstream::~ofstream flush is UAF. On Android 6 that zeroed
+    // the last 256KiB of classes.dex (map_list / class_data) → "Map is missing header".
+    std::vector<char> buf(kIoBuf);
     std::ofstream ofs(path, std::ios::binary | std::ios::trunc);
     if (!ofs) return false;
-    // Larger streambuf reduces syscalls on big DEX writes.
-    std::vector<char> buf(kIoBuf);
     ofs.rdbuf()->pubsetbuf(buf.data(), static_cast<std::streamsize>(buf.size()));
     ofs.write(reinterpret_cast<const char*>(data), static_cast<std::streamsize>(len));
-    return static_cast<bool>(ofs);
+    ofs.flush();
+    bool ok = static_cast<bool>(ofs);
+    ofs.close();
+    return ok;
 }
 
 static uint16_t ru16(const uint8_t* p) {
