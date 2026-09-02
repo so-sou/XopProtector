@@ -1,0 +1,92 @@
+{
+  "pages": [
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarTitleText": "首页探针"
+      }
+    },
+    {
+      "path": "pages/list/index",
+      "style": {
+        "navigationBarTitleText": "长列表",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/webview/index",
+      "style": {
+        "navigationBarTitleText": "WebView"
+      }
+    },
+    {
+      "path": "pages/theme/index",
+      "style": {
+        "navigationBarTitleText": "动态主题"
+      }
+    },
+    {
+      "path": "pages/native/index",
+      "style": {
+        "navigationBarTitleText": "原生能力"
+      }
+    }
+  ],
+  "subPackages": [
+    {
+      "root": "subPackages/shop",
+      "pages": [
+        {
+          "path": "detail/index",
+          "style": {
+            "navigationBarTitleText": "分包详情"
+          }
+        }
+      ]
+    }
+  ],
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#007AFF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页",
+        "iconPath": "static/tab/home.png",
+        "selectedIconPath": "static/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/list/index",
+        "text": "列表",
+        "iconPath": "static/tab/list.png",
+        "selectedIconPath": "static/tab/list-active.png"
+      },
+      {
+        "pagePath": "pages/webview/index",
+        "text": "WebView",
+        "iconPath": "static/tab/web.png",
+        "selectedIconPath": "static/tab/web-active.png"
+      },
+      {
+        "pagePath": "pages/theme/index",
+        "text": "主题",
+        "iconPath": "static/tab/theme.png",
+        "selectedIconPath": "static/tab/theme-active.png"
+      },
+      {
+        "pagePath": "pages/native/index",
+        "text": "原生",
+        "iconPath": "static/tab/native.png",
+        "selectedIconPath": "static/tab/native-active.png"
+      }
+    ]
+  },
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "XOP Demo",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  }
+}

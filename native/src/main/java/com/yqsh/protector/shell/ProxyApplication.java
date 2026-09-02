@@ -93,6 +93,11 @@ public class ProxyApplication extends Application {
             classLoaderReady = true;
             realApplicationName = safe(JniBridge.readApplicationName());
             Log.i(TAG, "shell init done, realApp=" + realApplicationName);
+            // Replace before ContentProvider install / DCloud path setup.
+            // Returning "" from getPackageName() (legacy dpt-shell trick) breaks
+            // UniApp (empty sPackageName, Android/data//). Early replace makes
+            // Providers attach to the real Application without that trick.
+            replaceApplication(false);
         } catch (Throwable t) {
             Log.e(TAG, "shell init failed", t);
             // Fail closed: a half-initialized shell leaves hollow stubs / missing
@@ -198,17 +203,15 @@ public class ProxyApplication extends Application {
     }
 
     /**
-     * Returning empty package name makes ContentProvider attach use createPackageContext path
-     * (same trick as dpt-shell), so Providers see the real Application.
-     * Only while not yet replaced — after replace Sophix may attach the real Application with
-     * this Proxy as base; an empty package name then breaks assets/classpath Properties load
-     * and triggers the app's "数据初始化异常" exit.
+     * Always return the real package name.
+     * <p>Legacy shells returned {@code ""} before replace so Provider install went through
+     * {@link #createPackageContext} (dpt-shell). That breaks UniApp/DCloud
+     * ({@code sPackageName=} empty, {@code Android/data//} paths). We now
+     * {@link #replaceApplication(boolean) replace early} in {@link #attachBaseContext},
+     * and keep {@link #createPackageContext} as a fallback if replace was deferred.
      */
     @Override
     public String getPackageName() {
-        if (!replaced && !TextUtils.isEmpty(realApplicationName)) {
-            return "";
-        }
         return super.getPackageName();
     }
 
@@ -218,10 +221,8 @@ public class ProxyApplication extends Application {
         }
         try {
             if (!replaced) {
-                // Mark replaced BEFORE makeApplication/attach so getPackageName()
-                // no longer returns "" while Sophix/real APP attachBaseContext runs.
-                // Empty package during attach breaks assets/files paths and later
-                // triggers BaseGuideActivity "数据初始化异常" + killProcess.
+                // Mark replaced BEFORE makeApplication/attach so Sophix/real APP
+                // attachBaseContext sees a consistent Application identity.
                 replaced = true;
                 realApplication = ApplicationReplacer.replace(realApplicationName);
                 if (realApplication == null) {

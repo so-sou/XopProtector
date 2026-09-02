@@ -17,3 +17,4 @@ rootProject.name = "XopProtector"
 include(":native")
 include(":demo")
 include(":packer")
+include(":unimp-host")

@@ -70,6 +70,19 @@ public final class BusinessSoProtector {
     };
 
     /**
+     * UniApp / DCloud Weex + Fresco image pipeline — skip in <b>all</b> modes.
+     * {@code .text} RC4 breaks Weex multi-process IPC ({@code spinWaitPeer timeout}).
+     */
+    private static final String[] UNIAPP_RUNTIME_EXACT_SKIP = {
+            "libweexjsb.so",
+            "libweexjst.so",
+            "libweexjss.so",
+            "libweexcore.so",
+            "libimagepipeline.so",
+            "libdcblur.so",
+    };
+
+    /**
      * Exact basenames for industry / early-load runtimes (SAFE/MAX only).
      * Encrypting these commonly yields SIGILL if decrypt is late.
      */
@@ -348,8 +361,18 @@ public final class BusinessSoProtector {
      * Industry / early-load SDKs — SAFE and MAX only.
      * No applicationId or customer-specific basenames.
      */
+    static boolean isUniAppRuntimeSkip(String name) {
+        if (name == null || name.isEmpty()) return false;
+        String lower = name.toLowerCase(Locale.ROOT);
+        for (String s : UNIAPP_RUNTIME_EXACT_SKIP) {
+            if (s.equals(lower)) return true;
+        }
+        return false;
+    }
+
     static boolean isIndustrySkip(String name) {
         if (name == null || name.isEmpty()) return true;
+        if (isUniAppRuntimeSkip(name)) return true;
         String lower = name.toLowerCase(Locale.ROOT);
         for (String s : INDUSTRY_EXACT_SKIP) {
             if (s.equals(lower)) return true;
@@ -371,6 +394,8 @@ public final class BusinessSoProtector {
         if (isShellLib(name)) return "shell";
         // Class S: all modes (AGGRESSIVE included) — Conscrypt / GLES collision.
         if (isSystemSonameSkip(name)) return "system_soname";
+        // UniApp / DCloud Weex: all modes — IPC breaks after .text RC4.
+        if (isUniAppRuntimeSkip(name)) return "uniapp/runtime";
         // Industry SDKs: SAFE/MAX only.
         if (mode != Mode.AGGRESSIVE && isIndustrySkip(name)) return "industry/runtime";
         return null;

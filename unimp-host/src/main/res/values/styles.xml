@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="DCloudMPHostActivityTheme" parent="@style/Theme.AppCompat">
+        <item name="android:windowAnimationStyle">@style/uniMPHostWindowAnimation</item>
+    </style>
+
+    <style name="uniMPHostWindowAnimation" parent="@android:style/Animation.Activity" />
+</resources>

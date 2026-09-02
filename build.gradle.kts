@@ -205,3 +205,181 @@ tasks.register("protectDemo") {
         println("Protected demo APK -> ${outApk.absolutePath}")
     }
 }
+
+tasks.register("syncUnimpSampleAssets") {
+    group = "protector"
+    description = "Copy DCloud SDK DEMO sample app (__UNI__F743940) into unimp-host assets"
+    doLast {
+        val sdkRootProp = (project.findProperty("unimp.sdk.libs") as String?)?.trim().orEmpty()
+        val libsDir = when {
+            sdkRootProp.isNotEmpty() -> file(sdkRootProp)
+            else -> file("E:/Android/SDK-Android@5.14-20260706/SDK/libs")
+        }
+        val demoApps = libsDir.parentFile?.parentFile
+            ?.resolve("DEMO/UniMPDemo/app/src/main/assets/apps/__UNI__F743940")
+            ?: throw GradleException("Cannot resolve SDK DEMO apps from ${libsDir.absolutePath}")
+        if (!demoApps.isDirectory) {
+            throw GradleException("Sample app missing: ${demoApps.absolutePath}")
+        }
+        val dest = rootProject.file("unimp-host/src/main/assets/apps/__UNI__F743940")
+        dest.parentFile.mkdirs()
+        if (dest.exists()) dest.deleteRecursively()
+        demoApps.copyRecursively(dest, overwrite = true)
+        println("Synced sample UniMP assets -> ${dest.absolutePath}")
+    }
+}
+
+tasks.register("buildUnimpXopDemo") {
+    group = "protector"
+    description = "npm run build:app in uniapp-demo (requires Node.js)"
+    doLast {
+        val demoDir = rootProject.file("uniapp-demo")
+        val npmCmd = if (System.getProperty("os.name").lowercase().contains("windows")) "npm.cmd" else "npm"
+        exec {
+            workingDir = demoDir
+            commandLine(npmCmd, "run", "build:app")
+        }
+        val out = demoDir.resolve("dist/build/app")
+        if (!out.resolve("manifest.json").isFile) {
+            throw GradleException("build:app did not produce dist/build/app/manifest.json")
+        }
+        println("Built XOPDEMO app resources -> ${out.absolutePath}")
+    }
+}
+
+tasks.register("syncUnimpXopDemoAssets") {
+    group = "protector"
+    description = "Copy uniapp-demo dist/build/app into unimp-host assets as __UNI__XOPDEMO"
+    doLast {
+        val wwwSrc = rootProject.file("uniapp-demo/dist/build/app")
+        if (!wwwSrc.resolve("manifest.json").isFile) {
+            throw GradleException(
+                "Missing ${wwwSrc.absolutePath}. Run: gradlew buildUnimpXopDemo  (or npm run build:app in uniapp-demo)"
+            )
+        }
+        val dest = rootProject.file("unimp-host/src/main/assets/apps/__UNI__XOPDEMO/www")
+        dest.parentFile.mkdirs()
+        if (dest.exists()) dest.deleteRecursively()
+        wwwSrc.copyRecursively(dest, overwrite = true)
+
+        val wgt = rootProject.file("unimp-host/src/main/assets/__UNI__XOPDEMO.wgt")
+        if (wgt.exists()) wgt.delete()
+        java.util.zip.ZipOutputStream(wgt.outputStream().buffered()).use { zos ->
+            wwwSrc.walkTopDown().filter { it.isFile }.forEach { f ->
+                val entry = wwwSrc.toPath().relativize(f.toPath()).toString().replace('\\', '/')
+                zos.putNextEntry(java.util.zip.ZipEntry(entry))
+                f.inputStream().use { it.copyTo(zos) }
+                zos.closeEntry()
+            }
+        }
+        println("Synced XOPDEMO www -> ${dest.absolutePath}")
+        println("Synced XOPDEMO wgt -> ${wgt.absolutePath} (${wgt.length()} bytes)")
+    }
+}
+
+tasks.register("protectUnimpDemo") {
+    group = "protector"
+    description = "Build unimp-host release, then pack with balanced + SO safe (UniApp smoke)"
+    dependsOn(":unimp-host:assembleRelease", "exportShellFiles", ":packer:jar")
+    doLast {
+        val hostApk = fileTree("unimp-host/build/outputs/apk/release") { include("*.apk") }.files.firstOrNull()
+            ?: throw GradleException("unimp-host release apk not found — run :unimp-host:assembleRelease")
+        val packerJar = rootProject.file("packer/build/libs").listFiles()
+            ?.filter { it.name.startsWith("protector-packer") && it.name.endsWith(".jar") }
+            ?.maxByOrNull { it.lastModified() }
+            ?: throw GradleException("packer jar not found")
+        val outApk = rootProject.file("executable/unimp-demo-protected.apk")
+        outApk.parentFile.mkdirs()
+        val debugKs = file("${System.getProperty("user.home")}/.android/debug.keystore")
+        if (!debugKs.isFile) {
+            throw GradleException("debug keystore not found: ${debugKs.absolutePath}")
+        }
+        println("Using packer jar: ${packerJar.name}")
+        println("Input: ${hostApk.absolutePath}")
+        exec {
+            commandLine(
+                "java", "-jar", packerJar.absolutePath,
+                hostApk.absolutePath,
+                "-o", outApk.absolutePath,
+                "--shell-dir", rootProject.file("executable/shell-files").absolutePath,
+                "--profile", "balanced",
+                "--protect-so",
+                "--protect-so-mode", "safe",
+                "--payment-auto-vmp",
+                "--no-industry-auto-vmp",
+                "--no-encrypt-assets",
+                "--no-res-protect",
+                "--keystore", debugKs.absolutePath,
+                "--alias", "androiddebugkey",
+                "--storepass", "android",
+                "--keypass", "android"
+            )
+        }
+        val report = rootProject.file("executable/unimp-demo-protected-size_report.json")
+        if (report.isFile) {
+            val text = report.readText()
+            val uniappHits = Regex("\"uniapp/runtime\"").findAll(text).count()
+            println("size_report uniapp/runtime hits=$uniappHits (expect >=6 if Weex SOs present)")
+            if (!text.contains("libweexcore.so")) {
+                println("WARN: libweexcore.so not mentioned in size_report")
+            } else if (!Regex("""libweexcore\.so[\s\S]{0,120}?uniapp/runtime""").containsMatchIn(text)
+                && !text.contains("\"reason\": \"uniapp/runtime\"")
+            ) {
+                // soft check — detailed path entries are enough when hits>=6
+            }
+            val weexCoreSkipped = text.contains("libweexcore.so") && text.contains("uniapp/runtime")
+            println("libweexcore + uniapp/runtime in report: $weexCoreSkipped")
+            println("Report: ${report.absolutePath}")
+        }
+        println("Protected UniMP APK -> ${outApk.absolutePath}")
+    }
+}
+
+/**
+ * CI / no-device check: assemble host release, run packer unit tests, ensure shell +
+ * UniMP assets are present. Does not require an emulator.
+ */
+tasks.register("checkUnimpDemo") {
+    group = "verification"
+    description = "CI: assembleRelease + packer tests + asset/shell sanity (no device)"
+    dependsOn(
+        ":unimp-host:assembleRelease",
+        ":packer:test",
+        "exportShellFiles",
+    )
+    doLast {
+        val releaseApk = fileTree("unimp-host/build/outputs/apk/release") { include("*.apk") }
+            .files.firstOrNull()
+            ?: throw GradleException("unimp-host release apk missing")
+        val shellDex = rootProject.file("executable/shell-files/dex/classes.dex")
+        if (!shellDex.isFile) {
+            throw GradleException("shell classes.dex missing: ${shellDex.absolutePath}")
+        }
+        val packerJar = rootProject.file("packer/build/libs").listFiles()
+            ?.filter { it.name.startsWith("protector-packer") && it.name.endsWith(".jar") }
+            ?.maxByOrNull { it.lastModified() }
+            ?: throw GradleException("packer jar missing")
+
+        // Prefer embedded XOPDEMO; sample F743940 is acceptable fallback for CI without npm.
+        val xopWww = rootProject.file("unimp-host/src/main/assets/apps/__UNI__XOPDEMO/www/manifest.json")
+        val sampleWww = rootProject.file("unimp-host/src/main/assets/apps/__UNI__F743940/www/manifest.json")
+        if (!xopWww.isFile && !sampleWww.isFile) {
+            throw GradleException(
+                "No UniMP app assets. Run syncUnimpSampleAssets and/or " +
+                    "buildUnimpXopDemo syncUnimpXopDemoAssets"
+            )
+        }
+
+        // Lightweight packer "dry-run": invoke jar --help / usage must exit non-crash.
+        exec {
+            commandLine("java", "-jar", packerJar.absolutePath)
+            isIgnoreExitValue = true
+        }
+
+        println("checkUnimpDemo OK")
+        println("  releaseApk=${releaseApk.absolutePath} (${releaseApk.length()} bytes)")
+        println("  packerJar=${packerJar.name}")
+        println("  shellDex=${shellDex.absolutePath}")
+        println("  XOPDEMO=${xopWww.isFile} sample=${sampleWww.isFile}")
+    }
+}

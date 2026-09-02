@@ -98,6 +98,7 @@ public final class ProtectPolicy {
             "Lcom/amazonaws/",
             "Lcom/taobao/",
             "Lcom/aliyun/",
+            "Lio/dcloud/",
             "Lio/flutter/",
             "Lio/netty/",
             "Lorg/bouncycastle/",

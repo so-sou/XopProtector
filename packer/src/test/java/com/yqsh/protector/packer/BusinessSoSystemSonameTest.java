@@ -33,6 +33,28 @@ class BusinessSoSystemSonameTest {
     }
 
     @Test
+    void uniAppWeexRuntimeSkippedInAllModes() throws Exception {
+        assertTrue(BusinessSoProtector.isUniAppRuntimeSkip("libweexjsb.so"));
+        assertTrue(BusinessSoProtector.isUniAppRuntimeSkip("libweexjst.so"));
+        assertTrue(BusinessSoProtector.isUniAppRuntimeSkip("libweexjss.so"));
+        assertTrue(BusinessSoProtector.isUniAppRuntimeSkip("libweexcore.so"));
+        assertTrue(BusinessSoProtector.isUniAppRuntimeSkip("libimagepipeline.so"));
+        assertTrue(BusinessSoProtector.isUniAppRuntimeSkip("libdcblur.so"));
+        assertFalse(BusinessSoProtector.isUniAppRuntimeSkip("libweex.so"));
+        assertFalse(BusinessSoProtector.isUniAppRuntimeSkip("libcpbase.so"));
+
+        var m = BusinessSoProtector.class.getDeclaredMethod(
+                "skipReason", String.class, BusinessSoProtector.Mode.class);
+        m.setAccessible(true);
+        assertEquals("uniapp/runtime",
+                m.invoke(null, "libweexjss.so", BusinessSoProtector.Mode.AGGRESSIVE));
+        assertEquals("uniapp/runtime",
+                m.invoke(null, "libweexcore.so", BusinessSoProtector.Mode.AGGRESSIVE));
+        assertEquals("uniapp/runtime",
+                m.invoke(null, "libimagepipeline.so", BusinessSoProtector.Mode.SAFE));
+    }
+
+    @Test
     void skipReasonAggressiveStillBlocksClassS() throws Exception {
         var m = BusinessSoProtector.class.getDeclaredMethod(
                 "skipReason", String.class, BusinessSoProtector.Mode.class);

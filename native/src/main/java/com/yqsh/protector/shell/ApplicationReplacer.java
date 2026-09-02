@@ -129,10 +129,13 @@ public final class ApplicationReplacer {
 
     /**
      * After providers were already installed under the replaced Application
-     * (createPackageContext path), clear AppBindData.providers so Sophix
-     * {@code onCreate} does not call {@code installContentProviders} again.
+     * (early {@code attachBaseContext} replace and/or createPackageContext path),
+     * clear AppBindData.providers so Sophix {@code onCreate} does not call
+     * {@code installContentProviders} again.
      * Re-install breaks InitProvider-style libs (e.g. AutoSize "can only be called once")
      * and Sophix then abandons before the business Application.onCreate runs.
+     * <p>Safe only when invoked from Application.onCreate (after framework
+     * Provider install). Do not call from attachBaseContext.
      */
     public static void markProvidersAlreadyInstalled() {
         try {
@@ -146,6 +149,11 @@ public final class ApplicationReplacer {
             }
             Object providers = getField(boundApp, "providers");
             int size = (providers instanceof List) ? ((List<?>) providers).size() : -1;
+            // Idempotent: already empty means install finished or never scheduled.
+            if (size == 0) {
+                Log.i(TAG, "providers already empty before Application.onCreate");
+                return;
+            }
             setField(boundApp, "providers", new ArrayList<>());
             Log.i(TAG, "cleared providers before Application.onCreate (was size=" + size + ")");
         } catch (Throwable t) {

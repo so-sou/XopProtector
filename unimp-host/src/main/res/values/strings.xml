@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Xop UniMP Demo</string>
+    <string name="host_title">XopProtector × UniMP Host</string>
+    <string name="btn_open_unimp">Open Uni Mini Program</string>
+</resources>

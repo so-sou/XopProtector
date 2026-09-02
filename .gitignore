@@ -83,3 +83,16 @@ desktop/**/*.suo
 **/*-sofix-verify.txt
 *.idsig
 *-size_report.json
+
+# UniMP host: large DCloud sample / exported www (sync via Gradle)
+unimp-host/src/main/assets/apps/
+unimp-host/src/main/assets/*.wgt
+unimp-host/libs/
+
+# uni-app CLI build artifacts
+uniapp-demo/node_modules/
+uniapp-demo/dist/
+uniapp-demo/unpackage/
+uniapp-demo/README.md.bak
+uniapp-demo-cli/
+
